@@ -1,0 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto&family=DM+Serif+Display:ital@0;1&family=Montserrat&family=Fira+Code&display=swap");
+
+$baseFontSize: 16 !default;
+$baseLineHeight: 26 / $baseFontSize !default;
+$leading: $baseLineHeight * 1rem !default;
+$capHeightRatio: 0.7;
+
+$titleFont: "DM Serif Display", serif;
+$copyFont: "Open Sans", "Montserrat", sans-serif;
+$monospaceFont: "Fira Code", monospace;
+
+$h1Size: 11.089rem;
+$h2Size: 6.854rem;
+$h3Size: 4.236rem;
+$h4Size: 2.618rem;
+$h5Size: 1.618rem;
+$h6Size: 1rem;
+
+html {
+    font-size: $baseFontSize / 16 * 100%;
+    line-height: $baseLineHeight;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -ms-text-size-adjust: 100%;
+}
+
+body {
+    font-family: $copyFont;
+    font-weight: 400;
+    color: $textColor;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: $titleFont;
+    font-weight: 400;
+}
+
+@mixin text($size, $lines) {
+    $lineHeight: $lines * $leading;
+    $capHeight: $capHeightRatio * $size;
+
+    font-size: $size;
+    line-height: $lineHeight;
+}
+
+@mixin rythm($size, $lines) {
+    $lineHeight: $lines * $leading;
+    $capHeight: $capHeightRatio * $size;
+
+    @include text($size, $lines);
+    padding-top: ($lineHeight - $capHeight) / 2;
+    margin-bottom: -($lineHeight - $capHeight) / 2;
+    padding-bottom: $leading;
+}
+
+h1 {
+    @include text($h1Size, 7);
+}
+
+h2 {
+    @include text($h2Size, 4);
+    margin-bottom: 0.25em;
+
+    * + & {
+        margin-top: 0.5em;
+    }
+}
+
+h3 {
+    @include text($h3Size, 3);
+}
+
+h4 {
+    @include text($h4Size, 2);
+}
+
+h5 {
+    @include text($h5Size, 1);
+}
+
+h6 {
+    @include text($h6Size, 1);
+}
+
+p {
+    @include text(1rem, 1);
+}
+
+code,
+pre {
+    font-family: "Fira Code", Menlo, Consolas, "Courier New", Courier, monospace;
+}
