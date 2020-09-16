@@ -4,8 +4,19 @@ layout: "default"
 
 <article class="author">
     <header>
-        <h1>{{page.title}}</h1>
+        <div class="poster">
+            <img src="{{page.poster}}" />
+        </div>
+        <h1 class="title">{{page.title}}</h1>
+        <div class="excerpt">{{ page.excerpt | strip_html | normalize_whitespace | truncate: 160 | escape }}</div>
+        <!-- <div class="metadata">
+            <span class="author">
+                <a href="{{author.url}}">{{author.name}}</a>
+            </span>
+            <span class="date">{{ page.date | date_to_long_string }}</span>
+        </div> -->
     </header>
-    <div class="meta">djlaskdjaslkd</div>
-    <section class="content">{{ content }}</section>
+    <div class="page">
+        <section class="content">{{ content }}</section>
+    </div>
 </article>

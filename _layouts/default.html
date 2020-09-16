@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8"/>
+        <meta charset="utf-8" />
         <title>{{ page.title }}</title>
-        <meta content="width=device-width, initial-scale=1" name="viewport"/>
-        <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}"/>
-        {% feed_meta %}
-        {% seo %}
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}" />
+        {% feed_meta %} {% seo %}
     </head>
     <body>
-        <header>
-            <h1>
-                <a href="/">Ubald<span class="dot">.</span>dev</a>
-            </h1>
-            <nav>
-                <ul>
-                    <li><a href="/posts">Rants</a></li>
-                    <li><a href="/about">About</a></li>
-                </ul>
-            </nav>
-        </header>
-        <main>{{ content }}</main>
-        <footer>
-            <nav></nav>
-        </footer>
+        <div class="container">
+            <header>
+                <h1>
+                    <a href="/">Ubald<span class="dot">.</span>dev</a>
+                </h1>
+                <nav>
+                    <ul>
+                        <li><a href="/posts">Rants</a></li>
+                        <li><a href="/about">About</a></li>
+                    </ul>
+                </nav>
+            </header>
+            <main>{{ content }}</main>
+            <footer>
+                <nav></nav>
+            </footer>
+        </div>
     </body>
 </html>

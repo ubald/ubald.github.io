@@ -4,8 +4,13 @@ layout: "default"
 
 <article class="page">
     <header>
-        <h1>{{page.title}}</h1>
+        <div class="poster">
+            <img src="{{page.poster}}" />
+        </div>
+        <h1 class="title">{{page.title}}</h1>
+        <div class="excerpt">{{ page.excerpt | strip_html | normalize_whitespace | truncate: 160 | escape }}</div>
     </header>
-    <!-- <div class="meta">djlaskdjaslkd</div> -->
-    <section class="content">{{ content }}</section>
+    <div class="page">
+        <section class="content">{{ content }}</section>
+    </div>
 </article>

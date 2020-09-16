@@ -6,6 +6,9 @@ layout: "default"
 
 <article class="post">
     <header>
+        <div class="poster">
+            <img src="{{page.poster}}" />
+        </div>
         <h1 class="title">{{page.title}}</h1>
         <div class="excerpt">{{ page.excerpt | strip_html | normalize_whitespace | truncate: 160 | escape }}</div>
         <div class="metadata">

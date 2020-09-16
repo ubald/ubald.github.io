@@ -314,16 +314,14 @@ pre.highlight,
 
 // Customization
 
-pre.highlight {
-    margin: 2em -10%;
-    padding: 4em 10%;
-    overflow-x: auto;
-}
-
 .highlight {
     .rouge-gutter {
         color: $syntax-gutter-text-color;
         background-color: $syntax-gutter-background-color;
-        padding-right: 1em;
     }
+}
+
+code.highlighter-rouge {
+    color: $syntax-text-color;
+    background-color: $syntax-background-color;
 }

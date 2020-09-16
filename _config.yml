@@ -29,6 +29,8 @@ url: "https://ubald.dev" # the base hostname & protocol for your site, e.g. http
 twitter_username: ubaldev
 github_username: ubald
 
+permalink: /:categories/:slug
+
 markdown: kramdown
 highlighter: rouge
 
@@ -46,6 +48,7 @@ kramdown:
             start_line: 1
 
 plugins:
+    - jemoji
     - jekyll-feed
     - jekyll-sitemap
     - jekyll-seo-tag
