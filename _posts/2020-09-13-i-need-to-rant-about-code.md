@@ -1,7 +1,7 @@
 ---
 title: "I need to rant about code!"
 category: rants
-poster: /assets/images/cats/kali2.jpg
+poster: cats/mini3.jpg
 excerpt: But first let me finish my website
 ---
 
@@ -12,6 +12,8 @@ excerpt: But first let me finish my website
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
 
 > Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
+
+Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
 
 Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
 
@@ -37,7 +39,7 @@ Consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus
 
 #### Aenean accumsan enim sed iaculis pretium
 
-Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
+Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
 
 {% include figure.html src="/assets/images/cats/mini.jpg" alt="Mini" caption="This is my cat Mini" %}
 
@@ -107,6 +109,8 @@ Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis fauci
 #### This is an h4 hopefully wrapping is an h4 hopefully wrapping
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
+
+![Test Image](/assets/images/2020-09-13-i-need-to-rant-about-code/butterblume.jpg)
 
 Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
 

@@ -1,16 +1,5 @@
 ---
-layout: "default"
+layout: "poster"
 ---
 
-<article class="page">
-    <header>
-        <div class="poster">
-            <img src="{{page.poster}}" />
-        </div>
-        <h1 class="title">{{page.title}}</h1>
-        <div class="excerpt">{{ page.excerpt | strip_html | normalize_whitespace | truncate: 160 | escape }}</div>
-    </header>
-    <div class="page">
-        <section class="content">{{ content }}</section>
-    </div>
-</article>
+{{content}}

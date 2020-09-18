@@ -1,5 +1,8 @@
 ---
+excerpt: Testing most of the markdown syntax styles
+poster: stock/ice.jpg
 ---
+
 # h1 Heading 8-)
 
 ## h2 Heading
@@ -13,11 +16,12 @@
 ###### h6 Heading
 
 ## Horizontal Rules
----
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 ---
 
----
+Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem.
 
 ## Typographic replacements
 
@@ -192,6 +196,10 @@ Duplicated footnote reference[^second].
 [^second]: Footnote text.
 
 ### [Definition lists](https://github.com/markdown-it/markdown-it-deflist)
+
+term
+: definition
+: another definition
 
 Term 1
 

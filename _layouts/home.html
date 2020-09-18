@@ -5,7 +5,7 @@ layout: "default"
 <article class="home">
     <header>
         <div class="poster">
-            <img src="{{page.poster}}" />
+            <img src="/assets/images/{{page.poster}}" />
         </div>
         <h1 class="title">{{page.title}}</h1>
         <div class="excerpt">{{ page.excerpt | strip_html | normalize_whitespace | truncate: 160 | escape }}</div>
