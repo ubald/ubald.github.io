@@ -1,0 +1,27 @@
+---
+layout: "default"
+---
+
+{% assign author = site.authors | where:"shortname", page.author | first %}
+
+<article class="{{page.type}}">
+    <header>
+        <div class="poster">
+            <img src="/assets/images/{{page.poster}}" />
+        </div>
+        <h1 class="title">{{page.title}}</h1>
+        <div class="excerpt">
+            &gt;&nbsp;{{ page.excerpt | strip_html | normalize_whitespace | truncate: 160 | escape }}
+        </div>
+        <div class="metadata">
+            <img src="/assets/images/authors/{{author.shortname}}/avatar.jpg" class="avatar" />
+            <span class="author">
+                <a href="{{author.url}}">{{author.name}}</a>
+            </span>
+            <span class="date">{{ page.date | date_to_long_string }}</span>
+        </div>
+    </header>
+    <div class="page">
+        <section class="content">{{ content }}</section>
+    </div>
+</article>

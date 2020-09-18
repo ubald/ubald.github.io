@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>{{ page.title }}</title>
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}" />
+        <script src="https://kit.fontawesome.com/7f3bbce892.js" crossorigin="anonymous"></script>
+        {% feed_meta %} {% seo %}
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>
+                    <a href="/">Ubald<span class="dot">.</span>dev</a>
+                </h1>
+                <nav>
+                    <ul>
+                        <li><a href="/posts">Rants</a></li>
+                        <li><a href="/about">About</a></li>
+                    </ul>
+                </nav>
+            </header>
+            <main>{{ content }}</main>
+            <footer>&copy;2020 François Ubald Brien. All rights reserved.</footer>
+        </div>
+        <script src="{{ '/assets/js/script.js' | relative_url }}"></script>
+    </body>
+</html>
