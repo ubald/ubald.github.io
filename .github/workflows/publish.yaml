@@ -44,6 +44,7 @@ jobs:
                   git checkout -b pub origin/pub
                   git rm -r --ignore-unmatch '*'
                   cp -r ../_site/. .
+                  cp ../CNAME .
                   git add --all
                   git config user.email "ubald@ubaldesign.com"
                   git config user.name "Jekyll Build"
