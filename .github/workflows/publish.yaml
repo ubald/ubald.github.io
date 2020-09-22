@@ -36,11 +36,15 @@ jobs:
 
             - name: Publish site
               run: |
-                  cd _site
+                  mkdir pub
+                  cd pub
                   git init
                   git remote add origin "https://${{ github.token }}@github.com/${{ github.repository }}.git"
                   git fetch --prune
-                  git checkout pub
+                  git checkout -b pub origin/pub
+                  git rm -r --ignore-unmatch '*'
+                  cp -r ../_site/. .
+                  git add --all
                   git config user.email "ubald@ubaldesign.com"
                   git config user.name "Jekyll Build"
                   git config push.default current
