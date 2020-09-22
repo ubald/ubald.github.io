@@ -49,6 +49,28 @@ Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis fauci
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus.
 
+```javascript
+/**
+ * Does a thing
+ */
+function helloWorld(param1, param2) {
+    var something = 0;
+
+    // Do something
+    if (2.0 % 2 == something) {
+        console.log(
+            "Hello, world! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Hello, world! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Hello, world! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Hello, world! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Hello, world! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Hello, world! Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        );
+    } else {
+        return null;
+    }
+
+    // @TODO comment
+}
+```
+
+Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas.
+
 ```c++
 void Div::setParent(Div *parent) {
     if (_parent != parent) {
@@ -75,26 +97,6 @@ void Div::setParent(Div *parent) {
             updateStyleRecursive();
         }
     }
-}
-```
-
-Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas.
-
-```javascript
-/**
- * Does a thing
- */
-function helloWorld(param1, param2) {
-    var something = 0;
-
-    // Do something
-    if (2.0 % 2 == something) {
-        console.log("Hello, world!");
-    } else {
-        return null;
-    }
-
-    // @TODO comment
 }
 ```
 

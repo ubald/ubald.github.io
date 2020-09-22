@@ -4,15 +4,20 @@ layout: "default"
 
 {% assign author = site.authors | where:"shortname", page.author | first %}
 
-<article class="{{page.type}}">
+<article class="{{page.type}} {{page.categories | join}}">
     <header>
-        <div class="poster">
-            <img src="/assets/images/{{page.poster}}" />
+        {% if page.poster %}
+        <img src="/assets/images/{{page.poster}}" class="poster" />
+        {% endif %}
+        <div class="titling">
+            <h1 class="title">{{page.title}}</h1>
+            {% if page.excerpt %}
+            <div class="excerpt">
+                &gt;&nbsp;{{ page.excerpt | strip_html | normalize_whitespace | truncate: 160 | escape }}
+            </div>
+            {% endif %}
         </div>
-        <h1 class="title">{{page.title}}</h1>
-        <div class="excerpt">
-            &gt;&nbsp;{{ page.excerpt | strip_html | normalize_whitespace | truncate: 160 | escape }}
-        </div>
+        {% if page.author %}
         <div class="metadata">
             <img src="/assets/images/authors/{{author.shortname}}/avatar.jpg" class="avatar" />
             <span class="author">
@@ -20,8 +25,9 @@ layout: "default"
             </span>
             <span class="date">{{ page.date | date_to_long_string }}</span>
         </div>
+        {% endif %}
     </header>
-    <div class="page">
-        <section class="content">{{ content }}</section>
-    </div>
+    {% if content != "" %}
+    <section class="page content">{{ content }}</section>
+    {% endif %}
 </article>
