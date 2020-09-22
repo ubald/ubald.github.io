@@ -39,7 +39,7 @@ jobs:
                   mkdir pub
                   cd pub
                   git init
-                  git remote add origin "https://${{ github.token }}@github.com/${{ github.repository }}.git"
+                  git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
                   git fetch --prune
                   git checkout -b pub origin/pub
                   git rm -r --ignore-unmatch '*'
