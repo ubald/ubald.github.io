@@ -11,15 +11,20 @@ jobs:
     name: Checkout repository
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v2
-      - name: Install dependencies
-        env:
-          GEM_HOME: ~/.gem
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: "2.7"
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      - name: Bundle install
         run: |
-          mkdir -p $GEM_HOME
-          gem install bundler
-          bundle
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
       - name: Build site
         env:
           JEKYLL_ENV: production
