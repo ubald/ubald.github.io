@@ -2,6 +2,7 @@
 excerpt: Testing most of the markdown syntax styles
 poster: stock/ice.jpg
 categories: test markdown
+hidden: true
 ---
 
 # h1 Heading 8-)

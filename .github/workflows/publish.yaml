@@ -1,0 +1,20 @@
+name: Publish Jekyll Site
+
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    checkout:
+        name: Checkout repository
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out repository code
+              uses: actions/checkout@v2
+            - name: Install dependencies
+              run: bundle
+            - name: Build site
+              env:
+                  JEKYLL_ENV: production
+              run: bundle exec jekyll build

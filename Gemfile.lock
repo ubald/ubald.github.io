@@ -254,8 +254,10 @@ PLATFORMS
 DEPENDENCIES
   github-pages
   jekyll-feed
+  jekyll-paginate
   jekyll-seo-tag
   jekyll-sitemap
+  jemoji
 
 BUNDLED WITH
    2.1.4

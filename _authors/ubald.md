@@ -2,7 +2,10 @@
 shortname: ubald
 name: François Ubald Brien
 email: ubald@ubald.dev
-poster: /assets/images/about/me.jpg
+github: https://github.com/ubald/
+linkedin: https://www.linkedin.com/in/ubald
+poster: about/me.jpg
+permalink: /about # Let's keep it as an about page for now until we have multiple authors (lol)
 ---
 
-This is me
+Skilled, self-taught back-end developer fluent in TypeScript/Javascript, Python, PHP and C++.
