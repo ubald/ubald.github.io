@@ -17,6 +17,7 @@ jobs:
         env:
           GEM_HOME: ~/.gem
         run: |
+          mkdir -p $GEM_HOME
           gem install bundler
           bundle
       - name: Build site
