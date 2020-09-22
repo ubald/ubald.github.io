@@ -7,25 +7,34 @@ on:
       - test-actions
 
 jobs:
-  checkout:
-    name: Checkout repository
+  build:
+    name: Build Jekyll Site
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-ruby@v1
         with:
           ruby-version: "2.7"
+
       - uses: actions/checkout@v2
+
       - uses: actions/cache@v2
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-gems-
+
       - name: Bundle install
         run: |
           bundle config path vendor/bundle
           bundle install --jobs 4 --retry 3
+
       - name: Build site
         env:
           JEKYLL_ENV: production
         run: bundle exec jekyll build
+
+      - name: Publish site
+        env:
+          JEKYLL_ENV: production
+        run: ls -al
