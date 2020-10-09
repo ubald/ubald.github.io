@@ -15,7 +15,7 @@ jobs:
 
             - name: Hugo install
               run: |
-                  https://github.com/gohugoio/hugo/releases/download/v0.76.3/hugo_extended_0.76.3_Linux-64bit.tar.gz
+                  wget https://github.com/gohugoio/hugo/releases/download/v0.76.3/hugo_extended_0.76.3_Linux-64bit.tar.gz
                   tar xf hugo_extended_0.76.3_Linux-64bit
 
             - name: Build site
