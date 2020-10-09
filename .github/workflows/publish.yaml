@@ -1,4 +1,4 @@
-name: Publish Jekyll Site
+name: Publish Hugo Site
 
 on:
     push:
@@ -8,31 +8,18 @@ on:
 
 jobs:
     build:
-        name: Build Jekyll Site
+        name: Build Hugo Site
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/setup-ruby@v1
-              with:
-                  ruby-version: "2.7"
-
             - uses: actions/checkout@v2
 
-            - uses: actions/cache@v2
-              with:
-                  path: vendor/bundle
-                  key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-gems-
-
-            - name: Bundle install
+            - name: Hugo install
               run: |
-                  bundle config path vendor/bundle
-                  bundle install --jobs 4 --retry 3
+                  https://github.com/gohugoio/hugo/releases/download/v0.76.3/hugo_extended_0.76.3_Linux-64bit.tar.gz
+                  tar xf hugo_extended_0.76.3_Linux-64bit
 
             - name: Build site
-              env:
-                  JEKYLL_ENV: production
-              run: bundle exec jekyll build
+              run: ./hugo --environment production --minify
 
             - name: Publish site
               run: |
@@ -43,11 +30,11 @@ jobs:
                   git fetch --prune
                   git checkout -b pub origin/pub
                   git rm -r --ignore-unmatch '*'
-                  cp -r ../_site/. .
+                  cp -r ../public/. .
                   cp ../CNAME .
                   git add --all
                   git config user.email "ubald@ubaldesign.com"
-                  git config user.name "Jekyll Build"
+                  git config user.name "Hugo Build"
                   git config push.default current
                   git commit -m "Sync build changes"
                   git push origin
