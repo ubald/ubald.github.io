@@ -1,0 +1,37 @@
+title: Ubald.dev
+
+params:
+    tagline: I need to rant about code
+    description: >- # this means to ignore newlines
+        Hi, my name is Ubald and this is me ranting about code.
+
+copyright: ©2020 François Ubald Brien. All rights reserved.
+languageCode: en-us
+
+# googleAnalytics: UA-123-45
+
+taxonomies:
+    author: authors
+    tag: tags
+    category: categories
+
+paginate: 12
+
+imaging:
+    resampleFilter: lanczos
+    quality: 90
+    disableLatLong: true
+
+pygmentsUseClasses: true
+markup:
+    highlight:
+        anchorLineNos: true
+        codeFences: true
+        guessSyntax: true
+        hl_Lines: ""
+        lineAnchors: ""
+        lineNoStart: 1
+        lineNos: true
+        lineNumbersInTable: true
+        noClasses: false
+        tabWidth: 4

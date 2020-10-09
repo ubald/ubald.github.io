@@ -1,0 +1,21 @@
+<section class="author">
+    {{- $path := printf "/authors/%s" (.Params.author | urlize) -}} 
+    {{- with $.Site.GetPage $path -}} 
+    {{- if isset .Params "avatar" -}} {{/* First check for a match in the page resources */}} 
+    {{- $avatar := .Resources.GetMatch .Params.avatar -}}
+    {{- if $avatar -}} 
+    {{- .Scratch.Set "avatar" ($avatar.Fit "256x256 q90 jpg") -}} 
+    {{- end -}} 
+    {{- end -}} 
+    {{- $avatar := .Scratch.Get "avatar" -}}
+    {{- if $avatar }}
+    <img src="{{ $avatar.Permalink }}" class="avatar" />
+    {{- end }}
+    <div class="bio">
+        <span class="author">
+            <a href="{{ .Permalink }}">{{ .Params.name }}</a>
+        </span>
+        <p>{{ .Summary }}</p>
+    </div>
+    {{- end }}
+</section>
