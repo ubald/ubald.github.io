@@ -1,9 +1,8 @@
 ---
 title: Network Collaboration
-category: rants
-poster: cats/mini3.jpg
-excerpt: But first let me finish my website
+categories: architecture networking
 date: 2020-09-20
+draft: true
 ---
 
 <!-- ![Test Image](/assets/images/2020-09-13-i-need-to-rant-about-code/butterblume.jpg) -->

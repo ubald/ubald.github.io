@@ -2,33 +2,17 @@
 <ol class="posts">
     {{- range .Paginator.Pages }}
     <li>
-        <article class='{{ if isset .Params "categories" }}category-{{ index (split .Params.categories " ") 0 }}{{ end }}'>
+        <article class='type-{{ .Type }} {{ if isset .Params "categories" }}category-{{ index (split .Params.categories " ") 0 }}{{ end }}'>
             <header>
-                <h2 class="title"><a href="{{ .Permalink }}">{{ .Title }}</a></h2>
-                <div class="metadata">
-                    {{- $path := printf "/authors/%s" (.Params.author | urlize) -}}
-                    {{- with $.Site.GetPage $path }}
-                    <span class="author">
-                        <a href="{{ .Permalink }}">{{ .Params.name }}</a>
-                    </span>
-                    {{- end }}
-                    <span class="date">{{ .Date.Format "Monday, January 2, 2006" }}</span>
-                    <span class="read-time"><i class="far fa-clock"></i> {{ .ReadingTime }} minutes</span>
-                    <ul class="categories">
-                    {{ if isset .Params "categories" -}}
-                    {{- range split .Params.Categories " " -}}
-                        <li class="category category-{{ . }}"><span class="category label">{{ . }}</span></li>
-                    {{- end -}}
-                    {{- end -}}
-                    </ul>
-                </div>
+                <h2 class="title" aria-label="Post title"><a href="{{ .Permalink }}" title="{{ .Title }}">{{ .Title }}</a></h2>
+                {{ partial "metadata" . }}
             </header>
-            <section class="content excerpt">
+            <section class="content excerpt" aria-label="Excerpt">
                 &gt;&nbsp;{{ .Summary }}
             </section>
         </article>
     </li>
     {{- end }}
 </ol>
-{{- partial "pagination.html" . -}}
+{{- partial "pagination" . -}}
 {{- end -}}

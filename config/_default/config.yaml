@@ -6,16 +6,22 @@ params:
         Hi, my name is Ubald and this is me ranting about code.
 
 copyright: ©2020 François Ubald Brien. All rights reserved.
+pouet: allo
 languageCode: en-us
 
-# googleAnalytics: UA-123-45
+enableEmoji: true
+disableHugoGeneratorInject: true
+enableRobotsTXT: true
+
+summaryLength: 30
+
+permalinks:
+    articles: /:section/:slug
 
 taxonomies:
     author: authors
     tag: tags
     category: categories
-
-paginate: 12
 
 imaging:
     resampleFilter: lanczos

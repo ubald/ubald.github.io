@@ -1,0 +1,35 @@
+<div class="metadata">
+    {{- $path := printf "/authors/%s" (.Params.author | urlize) -}}
+    {{- with $.Site.GetPage $path -}}   
+        {{- if isset .Params "avatar" -}}
+            {{- $avatar := .Resources.GetMatch .Params.avatar -}}
+            {{- if $avatar -}} 
+                {{- .Scratch.Set "avatar" ($avatar.Fit "128x128 q80 jpg") -}} 
+            {{- end -}} 
+        {{- end -}} 
+        {{- $avatar := .Scratch.Get "avatar" -}} 
+        {{- if $avatar }}
+        <a href="{{ .Permalink }}" title="Author"></a>
+            <img src="{{ $avatar.Permalink }}" class="avatar" title="Avatar" aria-hidden="true"/>
+        </a>
+        {{- end }}
+    <div>
+        <div class="byline">
+            <span class="author" aria-label="Author">
+                <a href="{{ .Permalink }}" title="Author">{{ .Params.name }}</a>
+            </span>
+    {{- end }}
+            {{ if not .Date.IsZero -}}
+                <span class="date" title="Published date">{{ .Date.Format "Monday, January 2, 2006" }}</span>
+            {{ end }}
+        </div>
+        <ul class="labels">
+            <li class="read-time" title="Reading time"><i class="far fa-clock"></i> {{ .ReadingTime }} minutes</li>
+            {{ if isset .Params "categories" -}}
+                {{- range split .Params.categories " " -}}
+                    <li class="category category-{{ . }}" title="Category {{ humanize . }}"><div class="category label">{{ humanize . }}</span></li>
+                {{- end -}}
+            {{- end -}}
+        </ul>
+    </div>
+</div>

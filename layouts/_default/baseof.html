@@ -2,12 +2,14 @@
 <html lang="en">
 
 <head>
+    {{ partial "google_analytics" . }}
     <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ .Title }} | {{ .Site.Title }}</title>
-    {{ $sass := resources.Get "sass/main.scss" | resources.ToCSS (dict "outputStyle" "compressed" "enableSourceMap" true) | fingerprint -}}
-    <link rel="stylesheet" href="{{ $sass.Permalink }}" />
-    <script src="https://kit.fontawesome.com/7f3bbce892.js" crossorigin="anonymous"></script>
+    <meta name="description" content="{{ .Params.Description | default .Params.Summary | default .Site.Params.Description }}"/>
+    {{ $sass := resources.Get "style/main.scss" | resources.ToCSS (dict "outputStyle" "compressed" "enableSourceMap" true) | fingerprint -}}
+    <link rel="stylesheet" href="{{ $sass.Permalink }}" media="screen"/>
+    <script src="https://kit.fontawesome.com/7f3bbce892.js" crossorigin="anonymous" defer></script>
     {{ range .AlternativeOutputFormats }}
     <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ $.Site.Title | safeHTML }}" />
     {{ end }}
@@ -19,12 +21,12 @@
     <div class="container">
         <header>
             <h1>
-                <a href="/">Ubald<span class="dot">.</span>dev</a>
+                <a href="/" title="Ubald.dev Home">Ubald<span class="dot">.</span>dev</a>
             </h1>
             <nav>
                 <ul>
-                    <li><a href="/articles">Rants</a></li>
-                    <li><a href="/about">About</a></li>
+                    <li><a href="/articles" title="Articles">Rants</a></li>
+                    <li><a href="/about" title="About">About</a></li>
                 </ul>
             </nav>
         </header>
@@ -32,7 +34,7 @@
             {{ block "main" . }}
             {{ end }}
         </main>
-        <footer>&copy;2020 Fran&ccedil;ois Ubald Brien. All rights reserved.</footer>
+        <footer>{{ .Site.Copyright }}</footer>
     </div>
     <script src="/js/script.js"></script>
 </body>

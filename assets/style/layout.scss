@@ -69,7 +69,7 @@ body {
 
         > footer {
             grid-area: footer;
-            color: $invertedDarkerTextColor;
+            color: $invertedMediumTextColor;
             height: 12em;
             display: flex;
             justify-content: center;
@@ -135,6 +135,25 @@ article.home {
                 align-items: center;
                 gap: 1em;
             }
+
+            > div {
+                align-items: center;
+                @include sm() {
+                    align-items: flex-start;
+                }
+                .byline {
+                    text-align: center;
+                    @include sm() {
+                        text-align: left;
+                    }
+                }
+                .labels {
+                    justify-content: center;
+                    @include sm() {
+                        justify-content: flex-start;
+                    }
+                }
+            }
         }
     }
 }
@@ -164,13 +183,18 @@ section.page.content {
         color: $headingColor;
 
         &:target {
-            // color: $invertedTitleColor;
             @include categoryColor();
         }
     }
 
     a {
-        color: $subduedTextColor;
+        @include categoryColor();
+        font-weight: bold;
+
+        &:hover,
+        &:active {
+            color: $textColor;
+        }
 
         &.anchor {
             display: none;
@@ -201,27 +225,27 @@ section.page.content {
     }
 
     p > img {
+        object-fit: scale-down;
         @include reversePageMargin(2rem);
-        max-width: calc(100% + (2 * #{$staticHorizontalMargins}));
+        width: calc(100% + (2 * #{$staticHorizontalMargins}));
         @include sm() {
-            max-width: calc(100% + (2 * #{$dymamicHorizontalMargins}));
+            width: calc(100% + (2 * #{$dymamicHorizontalMargins}));
         }
-        // margin: 2rem $reverseDymamicHorizontalMargins;
-        // max-width: 100%;
-        // margin: 2em 0;
 
         &::before {
             display: block;
+            color: $subduedTextColor;
+            font-style: italic;
             text-align: center;
+            @include pagePadding(0);
         }
     }
 
     figure {
-        // margin: 2rem $reverseDymamicHorizontalMargins;
         @include reversePageMargin(2rem);
 
         > img {
-            margin: 0.5em 0;
+            margin: 0.5em auto;
             max-width: 100%;
         }
 
@@ -315,7 +339,14 @@ ol.posts {
             }
 
             .excerpt {
-                @include heading(5);
+                font-size: 1rem;
+                line-height: 1.25;
+
+                @include sm() {
+                    @include heading(5);
+                    line-height: 1.25;
+                }
+
                 font-family: $monospaceFont;
                 color: $invertedMediumTextColor;
             }
@@ -336,7 +367,7 @@ ul.pagination {
     > li {
         list-style: none;
         a {
-            color: $invertedDarkerTextColor;
+            color: $invertedDarkTextColor;
             &:hover {
                 color: $invertedMediumTextColor;
             }
@@ -364,6 +395,23 @@ ul.pagination {
     align-items: center;
     gap: 1em;
 
+    > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25em;
+
+        .byline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+
+            @include sm() {
+                flex-direction: row;
+                gap: 0.5em;
+            }
+        }
+    }
+
     .avatar {
         width: 3em;
         height: 3em;
@@ -382,22 +430,27 @@ ul.pagination {
 
     .read-time {
         background-color: $decorationColor;
-        border-radius: 6px;
-        padding: 0 0.5em;
     }
 
-    ul.categories {
+    ul.labels {
         display: flex;
-        li.category {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5em;
+        margin: 0;
+
+        li {
+            font-size: 0.85rem;
             list-style: none;
-            margin-right: 0.5em;
+            &.read-time,
+            .label {
+                border-radius: 0.5em;
+                padding: 0 0.5em 0.15em 0.5em;
+            }
         }
     }
 }
 
-span.category.label {
-    font-family: $monospaceFont;
-    border-radius: 0.5em;
-    padding: 0 0.5em 0.15em 0.5em;
+div.category.label {
     @include categoryBackground();
 }

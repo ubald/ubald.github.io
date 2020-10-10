@@ -11,17 +11,29 @@ $category-default: $palette1;
 $category-rant: $palette4;
 $category-architecture: $palette5;
 
+$categoryColors: (
+    default: $palette1,
+    test: $palette6,
+    code: $palette2,
+    rant: $palette4,
+    architecture: $palette5,
+);
+
 @mixin categoryColor {
     color: $category-default;
-    .category-rant & {
-        color: $category-rant;
+    @each $category in map-keys($map: $categoryColors) {
+        .category-#{$category} & {
+            color: map-get($categoryColors, $category);
+        }
     }
 }
 
 @mixin categoryBackground {
     background-color: $category-default;
-    .category-rant & {
-        background-color: $category-rant;
+    @each $category in map-keys($map: $categoryColors) {
+        .category-#{$category} & {
+            background-color: map-get($categoryColors, $category);
+        }
     }
 }
 
@@ -29,9 +41,9 @@ $invertedBackground: #222;
 $invertedTitleColor: $palette1;
 $invertedForegroundColor: #eee;
 $invertedMediumTextColor: #aaa;
-$invertedDarkerTextColor: #666;
+$invertedDarkTextColor: #666;
 $invertedLinkColor: #eee;
-$pageBackground: #eee;
+$pageBackground: #f6f6f6; // #eee
 $headingColor: #3c3c3c;
 $textColor: #333;
 $subduedTextColor: #777;
@@ -42,6 +54,4 @@ $decorationColor: #ccc;
 @import "base";
 @import "typography";
 @import "layout";
-@import "page";
-@import "post";
 @import "syntax";

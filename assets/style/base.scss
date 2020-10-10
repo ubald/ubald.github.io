@@ -3,3 +3,12 @@
     // background: $invertedTitleColor;
     @include categoryBackground();
 }
+
+a:focus {
+    text-decoration: underline;
+}
+
+a:active,
+a:hover {
+    text-decoration: none;
+}
