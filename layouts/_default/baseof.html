@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    {{ partial "google_analytics" . }}
+    {{ partial "google_analytics" . -}}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ .Title }} | {{ .Site.Title }}</title>
@@ -12,31 +11,25 @@
     <script src="https://kit.fontawesome.com/7f3bbce892.js" crossorigin="anonymous" defer></script>
     {{ range .AlternativeOutputFormats }}
     <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ $.Site.Title | safeHTML }}" />
-    {{ end }}
-    {{ template "_internal/opengraph.html" . -}}
+    {{- end -}}
+    {{- template "_internal/opengraph.html" . -}}
     {{- template "_internal/twitter_cards.html" . -}}
 </head>
-
 <body>
     <div class="container">
-        <header>
-            <h1>
-                <a href="/" title="Ubald.dev Home">Ubald<span class="dot">.</span>dev</a>
-            </h1>
-            <nav>
-                <ul>
-                    <li><a href="/articles" title="Articles">Rants</a></li>
-                    <li><a href="/about" title="About">About</a></li>
-                </ul>
-            </nav>
+        <header class="main-header">
+            {{ partial "logo" . }}
+            {{ partial "menu" . }}
         </header>
         <main>
-            {{ block "main" . }}
-            {{ end }}
+            {{ block "main" . }}{{ end }}
         </main>
-        <footer>{{ .Site.Copyright }}</footer>
+        <footer class="main-footer">
+            {{ partial "logo" . }}
+            {{ partial "menu" . }}
+            <div class="copyright">{{ .Site.Copyright }}</div>
+        </footer>
     </div>
     <script src="/js/script.js"></script>
 </body>
-
 </html>

@@ -1,12 +1,9 @@
 ---
-title: "I need to rant about code again!"
-category: rants
-poster: UB5D9295_3k_90.jpg
-summary: But first let me finish my website
-date: 2020-10-09
+title: Psychic UI
 categories:
-    - rant
-    - technology
+    - code
+    - ui
+date: 2020-09-20
 draft: true
 ---
 
@@ -14,13 +11,11 @@ draft: true
 
 ## First, let me finish my fucking site
 
-Lorem ipsum dolor sit amet, [consectetur adipiscing elit](/about). Morbi a diam, eget fringilla lectus. [Morbi ex risus](/anywhere-else), euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
 
 > Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
 
 Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
-
-![Diagram](diagram.drawio.png)
 
 Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
 
@@ -34,23 +29,7 @@ Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis fauci
 
 ## Second, let me write some content
 
-![Kali](UB5D0638.jpg)
-
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus.
-    Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem.
-    Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus.
-    Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
-    Aenean accumsan enim sed iaculis pretium.
-    Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae.
-    Maecenas ultricies arcu a laoreet egestas.
-    Duis nunc diam, varius a neque ac, auctor finibus risus.
-    Praesent eu viverra odio, at imperdiet magna.
-    Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus.
-    Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris `quis` elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut `eleifend ex consectetur` vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
 
 ### Aenean accumsan enim
 
@@ -64,10 +43,7 @@ Consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus
 
 Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
 
-{{< figure src="UB5D5290_3k_90.jpg" title="Steve Francia" alt="Mini" caption="This is my cat Mini" >}}
-
-<!-- {{ $figure := .Parent.Resources.GetMatch (.Get "src") }}
-{{ $figure = ($figure.Fit "128x128 q80 jpg") }} -->
+{% include figure.html src="/assets/images/cats/mini.jpg" alt="Mini" caption="This is my cat Mini" %}
 
 Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
 

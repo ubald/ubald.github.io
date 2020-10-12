@@ -9,7 +9,7 @@
 {{ $poster := .Scratch.Get "poster" }}
 
 <article class="home">
-    <header>
+    <header class="cover">
         {{ if $poster }}
         <img src="{{ $poster.Permalink }}" class="poster" aria-hidden="true"/>
         {{ end }}

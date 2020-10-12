@@ -9,14 +9,14 @@
         {{- end -}} 
         {{- $avatar := .Scratch.Get "avatar" -}} 
         {{- if $avatar }}
-        <a href="{{ .Permalink }}" title="Author"></a>
+        <a href="{{ .Permalink }}" title="Author">
             <img src="{{ $avatar.Permalink }}" class="avatar" title="Avatar" aria-hidden="true"/>
         </a>
         {{- end }}
     <div>
         <div class="byline">
             <span class="author" aria-label="Author">
-                <a href="{{ .Permalink }}" title="Author">{{ .Params.name }}</a>
+                <a href="{{ .Permalink }}" title="Author">{{ .Params.Name }}</a>
             </span>
     {{- end }}
             {{ if not .Date.IsZero -}}
@@ -26,8 +26,11 @@
         <ul class="labels">
             <li class="read-time" title="Reading time"><i class="far fa-clock"></i> {{ .ReadingTime }} minutes</li>
             {{ if isset .Params "categories" -}}
-                {{- range split .Params.categories " " -}}
-                    <li class="category category-{{ . }}" title="Category {{ humanize . }}"><div class="category label">{{ humanize . }}</span></li>
+                {{- range .Params.Categories | uniq -}}
+                    <li class="category category-{{ . }} label" title="Category {{ humanize . }}">
+
+                        <a href="/categories/{{.}}">{{ humanize . }}</a>
+                    </li>
                 {{- end -}}
             {{- end -}}
         </ul>

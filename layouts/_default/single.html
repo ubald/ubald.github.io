@@ -7,15 +7,15 @@
 {{- end -}} 
 {{- $poster := .Scratch.Get "poster" -}}
 
-<article class='{{ .Kind }} type-{{ .Type }} {{ if isset .Params "categories" }} category-{{ index (split .Params.categories " ") 0 }}{{ end }}'>
-    <header>
+<article class='{{ .Kind }} type-{{ .Type }} {{ if isset .Params "categories" }} category-{{ index .Params.Categories 0 }}{{ end }}'>
+    <header class="cover">
         {{- if $poster -}}
         <img src="{{ $poster.Permalink }}" class="poster" aria-hidden="true"/>
         {{- end }}
         <div class="titling">
             <h1 class='title' aria-label="Title">{{ .Title }}</h1>
             <div class="excerpt" aria-label="Excerpt">
-                &gt;&nbsp;{{ .Summary }}
+                <span class="prompt">&gt;</span>&nbsp;{{ .Summary }}
             </div>
         </div>
         {{ if not (eq .Type "authors") -}}
@@ -23,13 +23,13 @@
         {{- end }}
     </header>
     <section class="content page">
+        {{ partial "series" . }}
         {{ .Content }}
+        {{ partial "series" . }}
         {{ if not (eq .Type "authors") -}}
         <hr/>
         {{- partial "author" . -}}
         {{- end }}
     </section>
-
 </article>
-
 {{ end }}

@@ -1,6 +1,8 @@
 ---
-title: Network Collaboration
-categories: architecture networking
+title: Network Collaboration Part 2 - The Architecture
+categories:
+    - architecture
+    - networking
 date: 2020-09-20
 draft: true
 ---
@@ -129,7 +131,3 @@ Praesent pharetra nunc quam, non gravida magna congue quis. Nulla facilisi. Cura
 Cras id iaculis dolor, sed ullamcorper orci. Praesent turpis magna, aliquet sit amet maximus eget, ornare id lectus. Nullam ullamcorper, erat nec pretium euismod, mi est aliquet libero, vel molestie mauris metus eget lorem. Cras molestie dolor urna, sit amet maximus arcu efficitur eu. Curabitur porttitor lectus eros, at interdum dui vestibulum vel. Praesent consectetur feugiat rhoncus. In bibendum tempus enim.
 
 Quisque quis mauris odio. Vestibulum imperdiet mauris sed tellus semper feugiat. Suspendisse non aliquet arcu, in maximus enim. Sed vulputate mauris quis eros pulvinar elementum. Nulla vitae tincidunt urna. Duis pellentesque tempus lectus, vel suscipit nulla sodales et. Proin auctor lectus sed egestas vehicula.
-
-```
-
-```

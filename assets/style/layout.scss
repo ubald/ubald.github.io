@@ -2,7 +2,7 @@ $headerHeight: 6rem;
 $dynamicHorizontalMargins: 10%;
 $staticHorizontalMargins: 1rem;
 $dymamicHorizontalMargins: (100% * $dynamicHorizontalMargins) / (100% - (2 * $dynamicHorizontalMargins));
-$pageVerticalMargins: 8em;
+$pageVerticalMargins: 8rem;
 
 @mixin pagePadding($verticalPadding) {
     padding: $verticalPadding $staticHorizontalMargins;
@@ -11,10 +11,10 @@ $pageVerticalMargins: 8em;
     }
 }
 
-@mixin pagePaddingForReversePageMargin($verticalPadding) {
+@mixin pagePaddingForReversePageMargin($verticalPadding, $verticalPadding2: null) {
     padding: $verticalPadding $staticHorizontalMargins;
     @include sm() {
-        padding: $verticalPadding $dymamicHorizontalMargins;
+        padding: ($verticalPadding2 or $verticalPadding) $dymamicHorizontalMargins;
     }
 }
 
@@ -27,139 +27,165 @@ $pageVerticalMargins: 8em;
 
 body {
     background-color: $invertedBackground;
+}
 
-    .container {
-        margin: 0 auto;
-        min-height: 100vh;
-        max-width: 1200px;
+.container {
+    margin: 0 auto;
+    min-height: 100vh;
+    max-width: 1200px;
+}
 
-        > header {
-            display: flex;
+header.main-header {
+    display: flex;
+    align-items: center;
+    height: $headerHeight;
+    @include pagePadding(0);
+}
+
+.site-logo {
+    font-family: $monospaceFont;
+    font-size: 1.5rem;
+    line-height: 2;
+    margin: 0;
+    color: $invertedForegroundColor;
+    .dot {
+        color: $invertedTitleColor;
+    }
+}
+
+nav.menu {
+    display: flex;
+    justify-content: flex-end;
+    flex-grow: 1;
+    > ul {
+        display: flex;
+        align-items: center;
+        gap: 1em;
+        margin: 0;
+        list-style: none;
+    }
+}
+
+header.list-header {
+    @include pagePadding(4rem);
+    display: flex;
+    flex-direction: column;
+    background-color: var(--category-color);
+    .term {
+        font-family: $monospaceFont;
+        color: $invertedForegroundColor;
+    }
+    h2 {
+        margin: 0;
+    }
+}
+
+header.cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    min-height: calc(100vh - #{$headerHeight});
+    @include pagePadding(0);
+
+    > .metadata {
+        flex-direction: column;
+        padding: 4em 0;
+
+        @include sm() {
+            flex-direction: row;
             align-items: center;
-            height: $headerHeight;
-            @include pagePadding(0);
-
-            > h1 {
-                font-family: $monospaceFont;
-                font-size: 1.5rem;
-                line-height: 2;
-                margin: 0;
-                color: $invertedForegroundColor;
-                .dot {
-                    color: $invertedTitleColor;
-                }
-            }
-
-            > nav {
-                display: flex;
-                flex-grow: 1;
-                justify-content: flex-end;
-
-                > ul {
-                    display: flex;
-                    list-style: none;
-                    align-items: center;
-
-                    li + li {
-                        margin-left: 1em;
-                    }
-                }
-            }
         }
 
-        > footer {
-            grid-area: footer;
-            color: $invertedMediumTextColor;
-            height: 12em;
-            display: flex;
-            justify-content: center;
+        > div {
             align-items: center;
+            gap: 1em;
+
+            @include sm() {
+                align-items: flex-start;
+                gap: 0.25em;
+            }
+
+            .byline {
+                text-align: center;
+                @include sm() {
+                    text-align: left;
+                }
+            }
+
+            .labels {
+                justify-content: center;
+                @include sm() {
+                    justify-content: flex-start;
+                }
+            }
         }
     }
 }
 
-article.page,
-article.home {
-    > header {
-        display: flex;
-        flex-direction: column;
-        justify-content: stretch;
-        min-height: calc(100vh - #{$headerHeight});
-        @include pagePadding(0);
+img.poster {
+    position: fixed;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    object-fit: cover;
+    filter: grayscale(50%) opacity(15%);
+    z-index: -1;
+}
 
-        > img.poster {
-            position: fixed;
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            object-fit: cover;
-            filter: grayscale(50%) opacity(15%);
-            z-index: -1;
+.titling {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+
+    > h1 {
+        margin-top: 0;
+        margin-bottom: 0.25em;
+
+        color: var(--category-color);
+        .home & {
+            color: $blue;
         }
+    }
 
-        > .titling {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            flex-grow: 1;
-
-            > h1 {
-                margin-top: 0;
-                margin-bottom: 0.25em;
-            }
-
-            > .excerpt {
-                font-family: $monospaceFont;
-                font-size: 1rem;
-                line-height: 1.3;
-                color: $invertedMediumTextColor;
-
-                @include lg {
-                    font-size: 2rem;
-                }
-            }
+    > .excerpt {
+        @include lg {
+            font-size: 2rem;
         }
+    }
+}
 
-        > .metadata {
-            display: flex;
-            flex-direction: column;
-            justify-content: left;
-            padding: 4em 0;
+footer.main-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
 
-            @include sm() {
-                flex-direction: row;
-                align-items: center;
-                gap: 1em;
-            }
+    @include pagePadding(3em);
 
-            > div {
-                align-items: center;
-                @include sm() {
-                    align-items: flex-start;
-                }
-                .byline {
-                    text-align: center;
-                    @include sm() {
-                        text-align: left;
-                    }
-                }
-                .labels {
-                    justify-content: center;
-                    @include sm() {
-                        justify-content: flex-start;
-                    }
-                }
-            }
-        }
+    color: $invertedMediumTextColor;
+    text-align: center;
+
+    @include sm() {
+        flex-direction: row;
+        flex-wrap: wrap;
+        text-align: left;
+    }
+
+    .copyright {
+        width: 100%;
+        padding-top: 3em;
     }
 }
 
 section.page.content {
     @include pagePadding($pageVerticalMargins);
+
     background-color: $pageBackground;
 
     // Margin hover anchors
@@ -173,7 +199,7 @@ section.page.content {
 
         // Margin anchor on hover, only enable when small or larger
         @include sm() {
-            margin-left: -$dynamicHorizontalMargins;
+            margin-left: (-$dynamicHorizontalMargins);
             padding-left: $dynamicHorizontalMargins;
             &:hover > a {
                 display: flex;
@@ -183,12 +209,12 @@ section.page.content {
         color: $headingColor;
 
         &:target {
-            @include categoryColor();
+            color: var(--category-color);
         }
     }
 
     a {
-        @include categoryColor();
+        color: var(--category-color);
         font-weight: bold;
 
         &:hover,
@@ -221,7 +247,6 @@ section.page.content {
     }
 
     hr {
-        // @include reversePageMargin(3rem);
     }
 
     p > img {
@@ -258,7 +283,6 @@ section.page.content {
     }
 
     div.highlight {
-        // margin: 2rem $reverseDymamicHorizontalMargins;
         @include reversePageMargin(2rem);
         @include pagePaddingForReversePageMargin(4em);
         overflow-x: auto;
@@ -274,12 +298,56 @@ section.page.content {
         background: white;
     }
 
+    pre > code {
+        font-size: 11px;
+        @include sm() {
+            font-size: 1rem;
+        }
+    }
+
+    .series-intro {
+        @include reversePageMargin(3rem);
+        @include pagePaddingForReversePageMargin($pageVerticalMargins/2);
+        background-color: var(--category-color);
+
+        p {
+            font-size: 1.25rem;
+        }
+
+        &:first-child {
+            margin-top: (-$pageVerticalMargins);
+        }
+
+        &:not(:first-child) {
+            margin-top: 3em;
+        }
+
+        li {
+            color: var(--category-color-darker);
+            &::marker {
+                color: var(--category-color-darker);
+            }
+            a {
+                font-weight: normal;
+                color: inherit;
+                &.active {
+                    color: $textColor;
+                }
+            }
+        }
+
+        & + hr {
+            display: none;
+        }
+    }
+
     > section.author {
         display: flex;
         flex-direction: column;
         justify-content: left;
         align-items: center;
         gap: 2em;
+        margin-top: 8rem;
 
         background-color: $pageBackground;
 
@@ -293,6 +361,7 @@ section.page.content {
             flex-shrink: 0;
             border-radius: 50%;
         }
+
         .bio {
             text-align: center;
 
@@ -304,15 +373,11 @@ section.page.content {
                 font-family: $titleFont;
                 font-size: 2rem;
                 a {
-                    color: $subduedTextColor;
+                    color: var(--category-color-dark);
                 }
             }
         }
     }
-}
-
-.titling > h1 {
-    @include categoryColor();
 }
 
 ol.posts {
@@ -320,42 +385,31 @@ ol.posts {
 
     > li {
         list-style: none;
-        margin-top: 6em;
-
-        > article {
-            @include pagePadding(0);
-
-            > header {
-                margin-bottom: 1rem;
-
-                > h2 {
-                    @include heading(3);
-                    margin-bottom: 0.25em;
-                    a {
-                        // color: $invertedTitleColor;
-                        // @include categoryColor();
-                    }
-                }
-            }
-
-            .excerpt {
-                font-size: 1rem;
-                line-height: 1.25;
-
-                @include sm() {
-                    @include heading(5);
-                    line-height: 1.25;
-                }
-
-                font-family: $monospaceFont;
-                color: $invertedMediumTextColor;
-            }
-        }
+        margin-top: 3rem;
     }
 }
 
-header > h2.title a {
-    @include categoryColor();
+article.preview {
+    @include pagePadding(0);
+
+    > header {
+        margin-bottom: 1rem;
+
+        > h2 {
+            @include heading(3);
+            margin-bottom: 0.25em;
+            a {
+                color: var(--category-color);
+            }
+        }
+    }
+
+    .excerpt {
+        @include sm() {
+            @include heading(5);
+            line-height: 1.25;
+        }
+    }
 }
 
 ul.pagination {
@@ -364,6 +418,7 @@ ul.pagination {
     display: flex;
     justify-content: center;
     gap: 1rem;
+    font-size: 1.5rem;
     > li {
         list-style: none;
         a {
@@ -421,7 +476,6 @@ ul.pagination {
     }
 
     .author {
-        // margin-right: 1em;
     }
 
     .date {
@@ -441,16 +495,34 @@ ul.pagination {
 
         li {
             font-size: 0.85rem;
+            font-weight: bold;
             list-style: none;
-            &.read-time,
-            .label {
-                border-radius: 0.5em;
-                padding: 0 0.5em 0.15em 0.5em;
+            border-radius: 0.5em;
+            padding: 0 0.5em 0.15em 0.5em;
+            a {
+                color: inherit;
             }
         }
     }
 }
 
-div.category.label {
-    @include categoryBackground();
+.category.label {
+    // This one doesn't use the variable since we want a default color
+    @include categoryLabelColor();
+}
+
+.excerpt {
+    font-family: $monospaceFont;
+    color: $invertedMediumTextColor;
+    font-size: 1rem;
+    line-height: 1.25;
+
+    .prompt {
+        color: $invertedForegroundColor;
+    }
+}
+
+.copyright {
+    font-size: 0.85em;
+    font-style: italic;
 }

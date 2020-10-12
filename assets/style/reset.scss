@@ -24,8 +24,7 @@ a {
         color: $invertedMediumTextColor;
     }
     &:active {
-        // color: $invertedTitleColor;
-        @include categoryColor();
+        color: var(--category-color);
     }
 }
 

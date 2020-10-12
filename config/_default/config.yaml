@@ -6,8 +6,17 @@ params:
         Hi, my name is Ubald and this is me ranting about code.
 
 copyright: ©2020 François Ubald Brien. All rights reserved.
-pouet: allo
 languageCode: en-us
+
+menu:
+    main:
+        - identifier: articles
+          name: Articles
+          url: /articles/
+          weight: 10
+        - identifier: about
+          name: About
+          url: /about/
 
 enableEmoji: true
 disableHugoGeneratorInject: true

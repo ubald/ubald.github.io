@@ -2,7 +2,12 @@
 title: Markdown Test
 excerpt: Testing most of the markdown syntax styles but with a long excerpt because I need a multiline excerpt
 poster: stock/ice.jpg
-categories: test rant markdown rant code
+categories:
+    - test
+    - rant
+    - markdown
+    - rant
+    - code
 draft: true
 ---
 

@@ -1,44 +1,41 @@
-$copyright: "2020 François Ubald Brien";
+// Atom One Dark
+$light: #abb2bf;
+$medium: #828997;
+$dark: #5c6370;
+$foreground: #abb2bf;
+$background: #282c34;
+$gutter: #636d83;
+$guide: rgba(171, 178, 191, 0.15);
 
-$palette1: #a2bdc1;
-$palette2: #a7a2c1;
-$palette3: #c1a2be;
-$palette4: #c1a2a2;
-$palette5: #c1bca2;
-$palette6: #a4c1a2;
+$purple: #c678dd;
+$blue: #61afef;
+$cyan: #56b6c2;
+$green: #98c379;
+$yellow: #e5c07b;
+$orange: #d19a66;
+$red: #be5046;
 
-$category-default: $palette1;
-$category-rant: $palette4;
-$category-architecture: $palette5;
+$blue_accent: #528bff;
 
-$categoryColors: (
-    default: $palette1,
-    test: $palette6,
-    code: $palette2,
-    rant: $palette4,
-    architecture: $palette5,
-);
+// $purple: #d883ff;
+// $blue: #33a8c7;
+// $cyan: #52e3e1;
+// $green: #a0e426;
+// $yellow: #fdf148;
+// $orange: #ffab00;
+// $red: #f77976;
 
-@mixin categoryColor {
-    color: $category-default;
-    @each $category in map-keys($map: $categoryColors) {
-        .category-#{$category} & {
-            color: map-get($categoryColors, $category);
-        }
-    }
-}
-
-@mixin categoryBackground {
-    background-color: $category-default;
-    @each $category in map-keys($map: $categoryColors) {
-        .category-#{$category} & {
-            background-color: map-get($categoryColors, $category);
-        }
-    }
-}
+// Ubald.dev
+// $blue: #a2bdc1;
+// $purple: #a7a2c1;
+// $palette3: #c1a2be;
+// $red: #c1a2a2;
+// $orange: #c1b0a2;
+// $yellow: #c1bca2;
+// $green: #a4c1a2;
 
 $invertedBackground: #222;
-$invertedTitleColor: $palette1;
+$invertedTitleColor: $blue;
 $invertedForegroundColor: #eee;
 $invertedMediumTextColor: #aaa;
 $invertedDarkTextColor: #666;
@@ -50,6 +47,7 @@ $subduedTextColor: #777;
 $decorationColor: #ccc;
 
 @import "mixins";
+@import "coloring";
 @import "reset";
 @import "base";
 @import "typography";

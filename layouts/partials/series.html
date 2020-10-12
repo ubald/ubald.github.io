@@ -1,0 +1,10 @@
+{{ if eq .CurrentSection.Params.type "series" }}
+<aside class="series-intro">
+    {{ .CurrentSection.Content }}
+    <ol>
+        {{ range .CurrentSection.Pages }}
+            <li><a href="{{ .Permalink }}" class='{{ if eq . $.Page }}active{{ end }}' title="{{ .Title }}">{{ .Title }}</a></li>
+        {{ end }}
+    </ol>
+</aside>
+{{ end }}

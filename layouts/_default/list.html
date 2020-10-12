@@ -1,18 +1,31 @@
 {{- define "main" -}}
-<ol class="posts">
-    {{- range .Paginator.Pages }}
-    <li>
-        <article class='type-{{ .Type }} {{ if isset .Params "categories" }}category-{{ index (split .Params.categories " ") 0 }}{{ end }}'>
-            <header>
-                <h2 class="title" aria-label="Post title"><a href="{{ .Permalink }}" title="{{ .Title }}">{{ .Title }}</a></h2>
-                {{ partial "metadata" . }}
-            </header>
-            <section class="content excerpt" aria-label="Excerpt">
-                &gt;&nbsp;{{ .Summary }}
-            </section>
-        </article>
-    </li>
-    {{- end }}
-</ol>
-{{- partial "pagination" . -}}
+
+<section class="list {{ .Kind }} {{ .Data.Singular }}-{{ .Name }}">
+    <header class="list-header">
+        {{ if eq .Kind "term" }}
+            <div class="term">{{ .Data.Singular | humanize }}:</div>
+            <h2>{{ .Title | humanize }}</h2>
+        {{ else }}
+            <h2>{{ .Title | humanize }}</h2>
+        {{ end }}
+    </header>
+
+    {{ $paginator := .Paginator (.Paginate .RegularPagesRecursive) }}
+    <ol class="posts">
+        {{- range $paginator.Pages }}
+        <li>
+            <article class='preview {{ if isset .Params "categories" }}category-{{ index .Params.Categories 0 }}{{ end }}'>
+                <header>
+                    <h2 class="title" aria-label="Post title"><a href="{{ .Permalink }}" title="{{ .Title }}">{{ .Title }}</a></h2>
+                    {{ partial "metadata" . }}
+                </header>
+                <section class="content excerpt" aria-label="Excerpt">
+                    <span class="prompt">&gt;</span>&nbsp;{{ .Summary }}
+                </section>
+            </article>
+        </li>
+        {{- end }}
+    </ol>
+    {{- partial "pagination" . -}}
+</section>
 {{- end -}}

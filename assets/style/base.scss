@@ -1,7 +1,6 @@
 ::selection {
     color: $textColor;
-    // background: $invertedTitleColor;
-    @include categoryBackground();
+    background-color: var(--category-color);
 }
 
 a:focus {

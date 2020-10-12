@@ -1,0 +1,94 @@
+$categoryColors: (
+    code: $purple,
+    algorithm: $blue,
+    rant: $orange,
+    architecture: $yellow,
+    test: $green,
+);
+
+@mixin categoryColor($color) {
+    --category-color: #{$color};
+    --category-color-dark: #{scale-color($color, $lightness: -30%, $saturation: -15%)};
+    --category-color-darker: #{scale-color($color, $lightness: -60%, $saturation: -30%)};
+}
+
+:root {
+    @include categoryColor($invertedMediumTextColor);
+}
+
+@each $category in map-keys($categoryColors) {
+    .category-#{$category} {
+        @include categoryColor(map-get($categoryColors, $category));
+    }
+}
+
+@mixin categoryLabelColor() {
+    color: $invertedBackground;
+    background-color: $invertedMediumTextColor;
+    @each $category in map-keys($categoryColors) {
+        &.category-#{$category} {
+            background-color: map-get($categoryColors, $category);
+        }
+    }
+}
+
+// @function defaultColor($color) {
+//     @return $color;
+// }
+
+// @mixin parentCategoryColor($fn: get-function("defaultColor")) {
+//     color: call($fn, map-get($categoryColors, "default"));
+//     @each $category in map-keys($categoryColors) {
+//         .category-#{$category} & {
+//             color: call($fn, map-get($categoryColors, $category));
+//         }
+//     }
+// }
+
+// @mixin categoryColor($fn: get-function("defaultColor")) {
+//     color: call($fn, map-get($categoryColors, "default"));
+//     @each $category in map-keys($categoryColors) {
+//         &.category-#{$category} {
+//             color: call($fn, map-get($categoryColors, $category));
+//         }
+//     }
+// }
+
+// @mixin parentCategoryBorder($fn: get-function("defaultColor")) {
+//     border-color: call($fn, map-get($categoryColors, "default"));
+//     @each $category in map-keys($categoryColors) {
+//         .category-#{$category} & {
+//             border-color: call($fn, map-get($categoryColors, $category));
+//         }
+//     }
+// }
+
+// @mixin categoryBorder($fn: get-function("defaultColor")) {
+//     border-color: call($fn, map-get($categoryColors, "default"));
+//     @each $category in map-keys($categoryColors) {
+//         &.category-#{$category} {
+//             border-color: call($fn, map-get($categoryColors, $category));
+//         }
+//     }
+// }
+
+// @mixin parentCategoryBackground($fn: get-function("defaultColor")) {
+//     color: $invertedBackground;
+//     background-color: call($fn, map-get($categoryColors, "default"));
+//     @each $category in map-keys($categoryColors) {
+//         .category-#{$category} & {
+//             color: $textColor;
+//             background-color: call($fn, map-get($categoryColors, $category));
+//         }
+//     }
+// }
+
+// @mixin categoryBackground($fn: get-function("defaultColor")) {
+//     color: $invertedBackground;
+//     background-color: call($fn, map-get($categoryColors, "default"));
+//     @each $category in map-keys($categoryColors) {
+//         &.category-#{$category} {
+//             background-color: call($fn, map-get($categoryColors, $category));
+//         }
+//     }
+// }

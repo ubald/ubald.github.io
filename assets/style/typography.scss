@@ -74,13 +74,14 @@ h6 {
         @include fontScale("augmented_fourth", $level);
     }
     @include xl() {
-        @include fontScale("golden_ratio", $level);
+        @include fontScale("perfect_fifth", $level);
     }
     line-height: 1;
 }
 
 @mixin text($size, $lines) {
-    $lineHeight: $lines * $leading;
+    $lineHeight: $lines * $baseLineHeight;
+    // $lineHeight: $lines * $leading;
     $capHeight: $capHeightRatio * $size;
 
     font-size: $size;
@@ -146,19 +147,24 @@ ul,
 ol {
     margin-top: 1em;
     margin-bottom: 1em;
-    margin-left: 1em;
+    //margin-left: 1em;
     // padding-left: 1em;
     list-style-position: inside;
 
+    ul &,
+    ol & {
+        margin-left: 1em;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
     li {
         text-decoration-color: $decorationColor;
+        & > p {
+            // Markdown conversion adds <p>'s inside ordered list items
+            display: inline;
+        }
     }
-}
-
-li > ul,
-li > ol {
-    margin-top: 0;
-    margin-bottom: 0;
 }
 
 table:not(.lntable) {
