@@ -1,0 +1,1 @@
+{{ .Title }}{{ if .Parent }}{{ if eq .Parent.Type "series" }} - {{ .Parent.Title }} Part {{ partial "values/series-part-number" . }}{{ end }}{{ end }} | {{ .Site.Title }}

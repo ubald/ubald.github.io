@@ -1,9 +1,10 @@
 $categoryColors: (
     code: $purple,
     algorithm: $blue,
-    rant: $orange,
-    architecture: $yellow,
+    networking: $cyan,
     test: $green,
+    architecture: $yellow,
+    rant: $orange,
 );
 
 @mixin categoryColor($color) {

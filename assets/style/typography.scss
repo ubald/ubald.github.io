@@ -21,13 +21,13 @@ $titleFont: "DM Serif Display", serif;
 $copyFont: "Open Sans", "Montserrat", sans-serif;
 $monospaceFont: "Fira Code", monospace;
 
-$h1Size: 11.089rem;
-$h2Size: 6.854rem;
-$h3Size: 4.236rem;
-$h4Size: 2.618rem;
-$h5Size: 1.618rem;
-$h6Size: 1rem;
-$smallSize: 0.618rem;
+// $h1Size: 11.089rem;
+// $h2Size: 6.854rem;
+// $h3Size: 4.236rem;
+// $h4Size: 2.618rem;
+// $h5Size: 1.618rem;
+// $h6Size: 1rem;
+// $smallSize: 0.618rem;
 
 html {
     font-size: $baseFontSize / 16 * 100%;
@@ -57,7 +57,7 @@ h6 {
 
 @function scale($scale, $level, $size: $baseFontSize) {
     $newSize: $size * map-get($fontScales, $scale);
-    @if $level < 5 {
+    @if $level < 6 {
         @return scale($scale, $level + 1, $newSize);
     } @else {
         @return ($newSize / $baseFontSize) * 1rem;
@@ -69,12 +69,12 @@ h6 {
 }
 
 @mixin heading($level) {
-    @include fontScale("perfect_fourth", $level);
+    @include fontScale("major_third", $level);
     @include lg() {
-        @include fontScale("augmented_fourth", $level);
+        @include fontScale("perfect_fourth", $level);
     }
     @include xl() {
-        @include fontScale("perfect_fifth", $level);
+        @include fontScale("augmented_fourth", $level);
     }
     line-height: 1;
 }
@@ -213,6 +213,15 @@ table:not(.lntable) {
         color: #555555;
         background-color: #f5f5f5;
         cursor: pointer;
+    }
+}
+
+dl {
+    dt {
+        font-weight: bold;
+    }
+    dd {
+        margin-bottom: 1em;
     }
 }
 

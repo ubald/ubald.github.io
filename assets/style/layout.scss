@@ -63,6 +63,13 @@ nav.menu {
         gap: 1em;
         margin: 0;
         list-style: none;
+
+        footer & {
+            flex-direction: column;
+            @include sm() {
+                flex-direction: row;
+            }
+        }
     }
 }
 
@@ -152,11 +159,21 @@ img.poster {
         }
     }
 
+    > h3 {
+        @include heading(5);
+        font-family: $monospaceFont;
+        margin-bottom: 0;
+    }
+
     > .excerpt {
         @include lg {
-            font-size: 2rem;
+            font-size: 1.5rem;
         }
     }
+}
+
+.subtitle {
+    color: $invertedDarkTextColor;
 }
 
 footer.main-footer {
@@ -304,77 +321,80 @@ section.page.content {
             font-size: 1rem;
         }
     }
+}
 
-    .series-intro {
-        @include reversePageMargin(3rem);
-        @include pagePaddingForReversePageMargin($pageVerticalMargins/2);
-        background-color: var(--category-color);
+.series-intro {
+    @include reversePageMargin(3rem);
+    @include pagePaddingForReversePageMargin($pageVerticalMargins/2);
+    background-color: var(--category-color);
 
-        p {
-            font-size: 1.25rem;
-        }
+    // border-left: 1em solid var(--category-color-dark);
 
-        &:first-child {
-            margin-top: (-$pageVerticalMargins);
-        }
+    p {
+        font-size: 1.25rem;
+    }
 
-        &:not(:first-child) {
-            margin-top: 3em;
-        }
+    &:first-child {
+        margin-top: (-$pageVerticalMargins);
+    }
 
-        li {
-            color: var(--category-color-darker);
-            &::marker {
-                color: var(--category-color-darker);
-            }
-            a {
-                font-weight: normal;
-                color: inherit;
-                &.active {
-                    color: $textColor;
-                }
-            }
-        }
+    &:not(:first-child) {
+        margin-top: 3em;
+    }
 
-        & + hr {
-            display: none;
+    a {
+        font-weight: normal;
+        color: $textColor !important;
+        &.active {
+            color: inherit !important;
         }
     }
 
-    > section.author {
-        display: flex;
-        flex-direction: column;
-        justify-content: left;
-        align-items: center;
-        gap: 2em;
-        margin-top: 8rem;
+    li {
+        color: var(--category-color-darker);
+        &::marker {
+            color: var(--category-color-darker);
+        }
+    }
 
-        background-color: $pageBackground;
+    & + hr {
+        display: none;
+    }
+}
+
+section.author {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    align-items: center;
+    gap: 2em;
+    margin-top: 8rem;
+
+    background-color: $pageBackground;
+
+    @include sm() {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 3em;
+    }
+
+    img.avatar {
+        flex-shrink: 0;
+        border-radius: 50%;
+    }
+
+    .bio {
+        text-align: center;
 
         @include sm() {
-            flex-direction: row;
-            align-items: flex-start;
-            gap: 3em;
+            text-align: left;
         }
 
-        img.avatar {
-            flex-shrink: 0;
-            border-radius: 50%;
-        }
-
-        .bio {
-            text-align: center;
-
-            @include sm() {
-                text-align: left;
-            }
-
-            .author {
-                font-family: $titleFont;
-                font-size: 2rem;
-                a {
-                    color: var(--category-color-dark);
-                }
+        .author {
+            font-family: $titleFont;
+            font-size: 2rem;
+            a {
+                color: var(--category-color-dark);
             }
         }
     }
@@ -385,7 +405,7 @@ ol.posts {
 
     > li {
         list-style: none;
-        margin-top: 3rem;
+        margin-top: 4rem;
     }
 }
 
@@ -395,21 +415,28 @@ article.preview {
     > header {
         margin-bottom: 1rem;
 
-        > h2 {
-            @include heading(3);
-            margin-bottom: 0.25em;
+        > h3 {
+            // @include heading(3);
+            // margin-bottom: 0.25em;
+            margin-top: 0;
             a {
                 color: var(--category-color);
             }
         }
-    }
 
-    .excerpt {
-        @include sm() {
-            @include heading(5);
-            line-height: 1.25;
+        > h4 {
+            @include heading(6);
+            font-family: $monospaceFont;
+            margin-bottom: 0;
         }
     }
+
+    // .excerpt {
+    //     @include sm() {
+    //         @include heading(6);
+    //         line-height: 1.25;
+    //     }
+    // }
 }
 
 ul.pagination {
@@ -506,7 +533,7 @@ ul.pagination {
     }
 }
 
-.category.label {
+.label {
     // This one doesn't use the variable since we want a default color
     @include categoryLabelColor();
 }

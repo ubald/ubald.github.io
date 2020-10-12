@@ -1,5 +1,5 @@
 {{ $figure := .Page.Resources.GetMatch (.Get "src") }}
-{{ $figure = $figure.Fit "1200x1200 q90 jpg" }}
+{{ $figure = $figure.Fit "1200x1200 q90" }}
 
 <figure{{ with .Get "class" }} class="{{ . }}"{{ end }}>
     {{- if .Get "link" -}}
@@ -7,7 +7,7 @@
     {{- end }}
     <img src="{{ $figure.Permalink }}"
          {{- if or (.Get "alt") (.Get "caption") }}
-         alt="{{ with .Get "alt" }}{{ . }}{{ else }}{{ .Get "caption" | markdownify| plainify }}{{ end }}"
+         alt="{{ with .Get "alt" }}{{ . }}{{ else }}{{ .Get "caption" | markdownify | plainify }}{{ end }}"
          {{- end -}}
          {{- with .Get "width" }} width="{{ . }}"{{ end -}}
          {{- with .Get "height" }} height="{{ . }}"{{ end -}}

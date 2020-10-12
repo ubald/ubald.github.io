@@ -25,7 +25,7 @@ enableRobotsTXT: true
 summaryLength: 30
 
 permalinks:
-    articles: /:section/:slug
+    articles: /:sections/:slug
 
 taxonomies:
     author: authors

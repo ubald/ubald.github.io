@@ -64,7 +64,7 @@ Consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus
 
 Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
 
-{{< figure src="UB5D5290_3k_90.jpg" title="Steve Francia" alt="Mini" caption="This is my cat Mini" >}}
+{{< figure src="UB5D5290_3k_90.jpg" alt="Mini" caption="This is my cat Mini" >}}
 
 <!-- {{ $figure := .Parent.Resources.GetMatch (.Get "src") }}
 {{ $figure = ($figure.Fit "128x128 q80 jpg") }} -->

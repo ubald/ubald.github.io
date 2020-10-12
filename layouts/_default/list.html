@@ -16,7 +16,10 @@
         <li>
             <article class='preview {{ if isset .Params "categories" }}category-{{ index .Params.Categories 0 }}{{ end }}'>
                 <header>
-                    <h2 class="title" aria-label="Post title"><a href="{{ .Permalink }}" title="{{ .Title }}">{{ .Title }}</a></h2>
+                    {{ if eq .Parent.Type "series" }}
+                        <h4 class="subtitle" aria-label="Post series">{{ .Parent.Title }} Part {{ partial "values/series-part-number" . }}</h4>
+                    {{ end }}
+                    <h3 class="title" aria-label="Post title"><a href="{{ .Permalink }}" title="{{ .Title }}">{{ .Title }}</a></h3>
                     {{ partial "metadata" . }}
                 </header>
                 <section class="content excerpt" aria-label="Excerpt">

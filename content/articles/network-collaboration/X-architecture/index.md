@@ -1,5 +1,5 @@
 ---
-title: Network Collaboration Part 2 - The Architecture
+title: Architecture
 categories:
     - architecture
     - networking

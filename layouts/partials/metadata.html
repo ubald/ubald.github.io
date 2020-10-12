@@ -28,8 +28,14 @@
             {{ if isset .Params "categories" -}}
                 {{- range .Params.Categories | uniq -}}
                     <li class="category category-{{ . }} label" title="Category {{ humanize . }}">
-
-                        <a href="/categories/{{.}}">{{ humanize . }}</a>
+                        <a href="/categories/{{ . | urlize }}">{{ humanize . }}</a>
+                    </li>
+                {{- end -}}
+            {{- end -}}
+            {{ if isset .Params "tags" -}}
+                {{- range .Params.Tags | uniq -}}
+                    <li class="tag tag-{{ . }} label" title="Tag {{ humanize . }}">
+                        <a href="/tags/{{ . | urlize }}">#{{ . }}</a>
                     </li>
                 {{- end -}}
             {{- end -}}
