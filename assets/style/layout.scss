@@ -303,8 +303,18 @@ section.page.content {
         @include reversePageMargin(2rem);
         @include pagePaddingForReversePageMargin(4em);
         overflow-x: auto;
-        table.lntable td:first-child {
-            padding-right: 1em;
+        table {
+            border-spacing: 0;
+            &.lntable {
+                td:first-child span:not(.hl) {
+                    display: block;
+                    padding-right: 1em;
+                    padding-left: 0.5em;
+                }
+                td:nth-child(2) {
+                    min-width: 100%;
+                }
+            }
         }
     }
 

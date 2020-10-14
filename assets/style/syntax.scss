@@ -92,6 +92,10 @@ pre.highlight,
     pre {
         background: $syntax-bg;
     }
+    .hl {
+        display: block;
+        background: darken($syntax-bg, 5%);
+    }
     .hll {
         background: $syntax-bg;
     }
@@ -300,7 +304,7 @@ pre.highlight,
     }
 
     ::selection {
-        color: $syntax-fg;
+        color: unset; // $syntax-fg;
         background-color: $syntax-selection-color;
     }
 

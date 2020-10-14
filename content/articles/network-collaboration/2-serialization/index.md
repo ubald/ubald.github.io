@@ -115,7 +115,7 @@ class TestObject:
     @staticmethod
     def deserialize(data: bytes) -> 'TestObject':
         with BytesIO(data) as buffer:
-            unpacker = msgpack.Unpacker(buffer)
+            unpacker = msgpack.Unpacker(buffer, raw=False)
             instance = TestObject()
             instance.someString = unpacker.unpack()
             instance.someInt = unpacker.unpack()
@@ -147,12 +147,12 @@ An initial implementation of this `Serializable` class might look like the follo
 
 ```python
 class Serializable:
-    fields = []
+    fields: ClassVar[List[str]] = []
 
     @classmethod
     def deserialize(cls, data: bytes) -> 'Serializable':
         with BytesIO(data) as buffer:
-            unpacker = msgpack.Unpacker(buffer)
+            unpacker = msgpack.Unpacker(buffer, raw=False)
             instance = cls()
             for field in instance.fields:
                 setattr(instance, field, unpacker.unpack())
@@ -165,18 +165,166 @@ class Serializable:
         return packer.bytes()
 ```
 
-From this point, we can look at how to improve this early prototype of a serializable class and make it into something more flexible. For starters, this won't let us extend from a serializable class and add fields to it because `fields` ends up being overwritten by the new subclass. In order to do this we need to be able to traverse the class hierarchy and accumulate fields that are defined at each level.
+From this point, we can look at how to improve this early prototype of a serializable class and progressively transform it into something more flexible. For starters, this won't let us extend from a serializable class and add fields to it because `fields` ends up being overwritten by the new subclass. In order to do this we need to be able to traverse the class hierarchy and accumulate fields that are defined at each level. For this we'll use this mouthful in the `Serializable` constructor:
 
 ```python
-@property
-def fields(self) -> List[str]:
-    # https://stackoverflow.com/questions/480214/how-do-you-remove-duplicates-from-a-list-in-whilst-preserving-order/39835527#39835527
-    return list(OrderedDict.fromkeys([
+def __init_subclass__(cls):
+    cls._fields = list(OrderedDict.fromkeys([
         field for fields in [
-            cast(Type[Serializable], c)._fields for c in reversed(self.__class__.mro()) if hasattr(c, '_fields') and cast(Type[Serializable], c)._fields is not None
-            c._fields for c in reversed(self.__class__.mro()) if hasattr(c, '_fields') and c._fields is not None
+            c.fields for c in reversed(cls.__mro__) \
+                if hasattr(c, 'fields') and c.fields is not None
         ] for field in fields
     ]))
+```
+
+First of all, it uses [\_\_init_subclass\_\_](https://docs.python.org/3/reference/datamodel.html#object.__init_subclass__) which is a method called whenever the containing class is subclassed. This allows us to initialize the list of serializable fields only once per subclass and store the results to a class variable. It leverages the class [MRO](https://docs.python.org/3/library/stdtypes.html?highlight=mro#class.__mro__) (Method Resolution Order) to traverse the class hierarchy in the same fashion Python would to resolve methods. Then, fields are accumulated, deduplicated and saved to be reused by the `serialize` and `deserialize` methods.
+
+Now that we have an easy way to define the serializable fields, the next thing to improve would be to add support for automatic restoration of serialized data into its original class. For this we'll need to create a registry to store associations between some identifier and the classes. A natural choice for the identifier would be the class name, it would even be easy to add this to `__init_subclass__` to automate the registration. But we need to remember our goal of having the smallest payload possible. A class name would use valuable space when transmitting serialized class instances over the network. Besides, if we keep in mind the context of the collaborative editing framework, we might want to interoperate with systems that might not be built in Python therefore might not have a direct equivalent to the class names. For that, we'll simply use a single byte to identify classes, we can always add a second byte later to group serializable classes by categories (more on that later, but something along the lines of grouping commands, requests, notifications, etc. under a prefix).
+
+Modifying our class gives us this:
+
+```python
+from typing import ClassVar, Dict, Type
+
+class Serializable:
+    _classes: ClassVar[Dict[int, Type['Serializable']]] = dict()
+
+    def __init_subclass__(cls, id: int):
+        if id in Serializable._classes:
+            raise Exception(f"Class id \"{id}\" already used by \"{Serializable._classes[id].__name__}\"")
+        Serializable._classes[id] = cls
+
+        cls._class_id = id
+        ...snip...
+```
+
+The `id` keyword argument added to `__init_subclass__` now makes it a requirement to pass an id when extending `Serializable`, like this:
+
+```python
+class Sample(Serializable, id=0x00)
+    ...
+```
+
+With the class registry in place we can now start including the id in the payload and use it back when deserializing.
+
+```python {hl_lines=["1","6-11","20"]}
+@staticmethod
+def deserialize(data: bytes) -> Optional['Serializable']:
+    with BytesIO(data) as buffer:
+        unpacker = msgpack.Unpacker(buffer, raw=False)
+
+        class_id = unpacker.unpack()
+        cls = Serializable._classes.get(class_id)
+        if not cls:
+            return None
+
+        instance = cls()
+        for field in cls._fields:
+            setattr(instance, field, unpacker.unpack())
+
+        return instance
+
+def serialize(self) -> bytes:
+    packer = msgpack.Packer(autoreset=False)
+
+    packer.pack(self._class_id)
+
+    for field in self.__class__._fields:
+        packer.pack(getattr(self, field))
+
+    return packer.bytes()
+```
+
+Note here that besides the additional code, `@classmethod` was changed to `@staticmethod` since we don't require the class argument anymore to create a new instance, we get the class from the registry. WIth those simple changes it is now possible to deserialize data without knowing the class in advance:
+
+```python
+data = Sample().serialize()
+restored = Serializable.deserialize(data)
+print(isinstance(restored, Sample)) # True
+```
+
+##### Reworking the constructor
+
+Something that might not seem evident in the simplified examples so far is that our deserialization method messes up with our habits with the constructor. Because the class is instantiated first and then values are set from the payload, we can't initialize the instance using those values.
+
+```python
+class Sample(Serializable, id=0x00):
+    fields = ["foo"]
+
+    def __init__(self, foo:str = None):
+        self.foo = foo
+        print(self.foo) # placeholder for anything depending on `self.foo` being set
+
+sample = Sample("Hello World!") # "Hello World!"
+data = sample.serialize()
+restored = Serializable.deserialize(data) # None
+print(restored.foo) # "Hello World!"
+```
+
+Here another side effect of how we construct the class instance is that we _have_ to make all arguments optional since the deserializer doesn't pass anything to the constructor. We could come up with a way to pass all the values to the constructor but we couldn't possibly know, in the deserializer, what arguments to pass. Besides, we don't want to prevent developers from using the classes normally in order to work with the serializer.
+
+Fortunately, Python is full of useful tricks that we can use to accomplish what we want with minimal impact to the end user. We keep all the complexity encapsulated in the `Serializable` class and expose the least amount of it possible. In Python we can create an instance of a class by calling [\_\_new\_\_](https://docs.python.org/3/reference/datamodel.html#object.__new__) on the class. It will create an instance but will not call `__init__` on the new instance.
+
+```python {hl_lines=["11"]}
+    @staticmethod
+    def deserialize(data: bytes) -> Optional['Serializable']:
+        with BytesIO(data) as buffer:
+            unpacker = msgpack.Unpacker(buffer, raw=False)
+
+            class_id = unpacker.unpack()
+            cls = Serializable._classes.get(class_id)
+            if not cls:
+                return None
+
+            instance = cls.__new__(cls)
+            for field in cls._fields:
+                setattr(instance, field, unpacker.unpack())
+
+            return instance
+```
+
+That only gets us a third of the way there though. Because, now, anything that we were relying on from the constructor doesn't get called at all. We can introduce a new convention for this, we can decide that `__init__` is only for setting instance variables from manually constructed classes and introduce an `initialize()` method that can be used to implement initialization logic that depends on those values. The deserializer can call that method once everything is set.
+
+```python {hl_lines=["15"]}
+    @staticmethod
+    def deserialize(data: bytes) -> Optional['Serializable']:
+        with BytesIO(data) as buffer:
+            unpacker = msgpack.Unpacker(buffer, raw=False)
+
+            class_id = unpacker.unpack()
+            cls = Serializable._classes.get(class_id)
+            if not cls:
+                return None
+
+            instance = cls.__new__(cls)
+            for field in cls._fields:
+                setattr(instance, field, unpacker.unpack())
+
+            instance.initialize()
+
+            return instance
+```
+
+We're now two thirds of the way there. We fixed the deserialization, but creating an instance manually won't call the new `initialize()` method. Again, it shouldn't be the end user's responsibility to call this manually.
+
+As always, there's a way to make this possible, and now it involves using [metaclasses](https://docs.python.org/3/reference/datamodel.html#metaclasses). Metaclasses are to classes what classes are to instances, if that makes sense. If a class has a metaclass, it will be used to "construct" the class. We can implement a simple metaclass that leverages [`__call__`](https://docs.python.org/3/reference/datamodel.html#emulating-callable-objects) to "intercept" instance creation calls and add our own logic to it that will call `initialize()` automatically for us.
+
+```python {hl_lines=["1-5","8","11-13"]}
+class SerializableMeta(type):
+    def __call__(cls, *args, **kwargs):
+        obj = type.__call__(cls, *args, **kwargs)
+        obj.initialize()
+        return obj
+
+
+class Serializable(metaclass=SerializableMeta):
+    ...
+
+    def initialize(self):
+        """Placeholder, should be overridden if necessary"""
+        pass
+
+    ...
 ```
 
 ### Bonus flexibility
