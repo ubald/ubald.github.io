@@ -8,6 +8,8 @@ $categoryColors: (
 );
 
 @mixin categoryColor($color) {
+    --category-color-lighter: #{scale-color($color, $lightness: 60%, $saturation: -15%)};
+    --category-color-light: #{scale-color($color, $lightness: 30%, $saturation: -15%)};
     --category-color: #{$color};
     --category-color-dark: #{scale-color($color, $lightness: -30%, $saturation: -15%)};
     --category-color-darker: #{scale-color($color, $lightness: -60%, $saturation: -30%)};

@@ -55,17 +55,17 @@ h6 {
     }
 }
 
-@function scale($scale, $level, $size: $baseFontSize) {
+@function calculateScale($scale, $level, $size: $baseFontSize) {
     $newSize: $size * map-get($fontScales, $scale);
     @if $level < 6 {
-        @return scale($scale, $level + 1, $newSize);
+        @return calculateScale($scale, $level + 1, $newSize);
     } @else {
         @return ($newSize / $baseFontSize) * 1rem;
     }
 }
 
 @mixin fontScale($scale, $level) {
-    font-size: scale($scale, $level);
+    font-size: calculateScale($scale, $level);
 }
 
 @mixin heading($level) {
@@ -232,8 +232,15 @@ pre {
 }
 
 p code {
-    padding: 0.25em 0.5em;
-    border-radius: 0.5em;
+    padding: 0.125em 0.5em;
+    border-radius: 0.25em;
+
+    font-size: 0.9rem;
+    font-weight: bold;
+
+    color: $textColor !important;
+    background-color: darken($pageBackground, 5%);
+    // background-color: var(--category-color-lighter);
 }
 
 blockquote {

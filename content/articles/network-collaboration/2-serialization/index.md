@@ -177,7 +177,7 @@ def __init_subclass__(cls):
     ]))
 ```
 
-First of all, it uses [\_\_init_subclass\_\_](https://docs.python.org/3/reference/datamodel.html#object.__init_subclass__) which is a method called whenever the containing class is subclassed. This allows us to initialize the list of serializable fields only once per subclass and store the results to a class variable. It leverages the class [MRO](https://docs.python.org/3/library/stdtypes.html?highlight=mro#class.__mro__) (Method Resolution Order) to traverse the class hierarchy in the same fashion Python would to resolve methods. Then, fields are accumulated, deduplicated and saved to be reused by the `serialize` and `deserialize` methods.
+First of all, it uses [`__init_subclass__`](https://docs.python.org/3/reference/datamodel.html#object.__init_subclass__) which is a method called whenever the containing class is subclassed. This allows us to initialize the list of serializable fields only once per subclass and store the results to a class variable. It leverages the class [MRO](https://docs.python.org/3/library/stdtypes.html?highlight=mro#class.__mro__) (Method Resolution Order) to traverse the class hierarchy in the same fashion Python would to resolve methods. Then, fields are accumulated, deduplicated and saved to be reused by the `serialize` and `deserialize` methods.
 
 Now that we have an easy way to define the serializable fields, the next thing to improve would be to add support for automatic restoration of serialized data into its original class. For this we'll need to create a registry to store associations between some identifier and the classes. A natural choice for the identifier would be the class name, it would even be easy to add this to `__init_subclass__` to automate the registration. But we need to remember our goal of having the smallest payload possible. A class name would use valuable space when transmitting serialized class instances over the network. Besides, if we keep in mind the context of the collaborative editing framework, we might want to interoperate with systems that might not be built in Python therefore might not have a direct equivalent to the class names. For that, we'll simply use a single byte to identify classes, we can always add a second byte later to group serializable classes by categories (more on that later, but something along the lines of grouping commands, requests, notifications, etc. under a prefix).
 
@@ -204,6 +204,8 @@ The `id` keyword argument added to `__init_subclass__` now makes it a requiremen
 class Sample(Serializable, id=0x00)
     ...
 ```
+
+It is good to remember that while this makes the registration of serializable classes automatic, they still need to be imported somewhere for this to work. It might sound obvious said like this, but it is entirely possible that a client or server make use of some properties or methods of a deserialized object without ever using the class directly. It's a good idea to import all serializable classes in a module and import that module when initializing the application.
 
 With the class registry in place we can now start including the id in the payload and use it back when deserializing.
 
@@ -327,11 +329,113 @@ class Serializable(metaclass=SerializableMeta):
     ...
 ```
 
-### Bonus flexibility
+##### Adding custom serializers
 
-Custom serialization and custom serializers.
+There's yet another detail we're missing. As-is, we can serialize pretty much anything but not other class instances. If we want to serialize other classes, they will first need to be serializable themselves and we'll need to register custom serializers and use them with `msgpack`.
 
-## Class structure
+To accomplish that we can use what `msgpack` call extended types. At serialization, when creating the `Packer` instance, we can pass a `default` argument to the constructor. This function will be called with a value when `msgpack` can't serialize it. It gives us the change to decide how to serialize the data and return `bytes` identified by an `int` code, wrapped in an `ExtType`.
+
+But before that, let's add a way to register custom serializers. We don't want to bloat the serialization method with a bunch of different ways to serialize data. We can't predict _all_ the possible data type a user might want to serialize so it's better to allow them to implement their own and register them.
+
+Here's the base class to extend to create a custom serializer:
+
+```python
+from abc import ABCMeta, abstractmethod
+from typing import Generic, TypeVar, Optional, Any
+
+
+T = TypeVar('T')
+
+
+class CustomSerializer(Generic[T], metaclass=ABCMeta):
+
+    def __init_subclass__(cls, code: int):
+        Serializable.add_custom_serializer(code=code, serializer=cls())
+
+    @abstractmethod
+    def serialize(self, obj: T) -> Optional[bytes]:
+        """
+        This method should return a bytes representation of obj
+        if it is able to serialize it and None if it doesn't
+        support the serialization of obj.
+        """
+        pass
+
+    @abstractmethod
+    def deserialize(self, data: bytes) -> Optional[T]:
+        """
+        This method should return an instance of T from
+        the bytes in data or None if there was an error.
+        """
+        pass
+```
+
+And this is our custom serializer allowing `msgpack` to work with `Serializable` classes:
+
+```python
+class SerializableSerializer(CustomSerializer[Serializable], code=0x00):
+
+    def serialize(self, obj: Serializable) -> Optional[bytes]:
+        if not isinstance(obj, Serializable):
+            return None
+        return obj.serialize()
+
+    def deserialize(self, data: bytes) -> Optional[Serializable]:
+        return Serializable.deserialize(data)
+```
+
+Just like with serializable classe, it is important to reference custom serializers somewhere by importing them in order to have them auto-register.
+
+Before getting into how to use the custom serializers we'll first add the`add_custom_serializer` method to the `Serializable` class.
+
+```python
+class Serializable(metaclass=SerializableMeta):
+
+    ...snip...
+
+    _serializers: ClassVar[Dict[int, CustomSerializer]] = dict()
+
+    @classmethod
+    def add_custom_serializer(cls, code: int, serializer: CustomSerializer) -> None:
+        if code in cls._serializers:
+            raise Exception(f"Serializer code {code} already in use")
+        cls._serializers[code] = serializer
+
+    ...snip...
+```
+
+These are the modifications to the `serialize` method. From here we can see how the `default` function works. Since we can't know what the criteria for a custom serializer might be, we loop over each one registered and call it. If it returns a value, we use it, and if it returns `None` then we skip and try the next one. It's setup to raise an exception if a value that is expected to be serialized doesn't have a custom serializer. It allow catching mistakes while developing rather than learn later that some value was never serialized.
+
+```python {hl_lines=["2-9"]}
+def serialize(self) -> bytes:
+    def default(obj: Any) -> msgpack.ExtType:
+        for code, serializer in self._serializers.items():
+            data = serializer.serialize(obj)
+            if data:
+                return msgpack.ExtType(code, data)
+        raise TypeError(f"Unknown type encountered: {obj}")
+
+    packer = msgpack.Packer(default=default, autoreset=False)
+
+    ...snip...
+```
+
+The `deserialize` method now looks like this, with the added `ext_hook` method:
+
+```python {hl_lines=["1-5","7","10-11"]}
+@classmethod
+def ext_hook(cls, code: int, data: bytes) -> Any:
+    serializer = cls._serializers.get(code)
+    if serializer:
+        return serializer.deserialize(data)
+
+@classmethod
+def deserialize(cls, data: bytes) -> Optional['Serializable']:
+    with BytesIO(data) as buffer:
+        unpacker = msgpack.Unpacker(
+            buffer, ext_hook=cls.ext_hook, raw=False)
+    ...snip...
+```
 
 ## Known Issues
 
