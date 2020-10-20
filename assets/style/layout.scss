@@ -1,7 +1,7 @@
 $headerHeight: 6rem;
 $dynamicHorizontalMargins: 10%;
 $staticHorizontalMargins: 1rem;
-$dymamicHorizontalMargins: (100% * $dynamicHorizontalMargins) / (100% - (2 * $dynamicHorizontalMargins));
+$inverseDynamicHorizontalMargins: (100% * $dynamicHorizontalMargins) / (100% - (2 * $dynamicHorizontalMargins));
 $pageVerticalMargins: 8rem;
 
 @mixin pagePadding($verticalPadding) {
@@ -14,14 +14,14 @@ $pageVerticalMargins: 8rem;
 @mixin pagePaddingForReversePageMargin($verticalPadding, $verticalPadding2: null) {
     padding: $verticalPadding $staticHorizontalMargins;
     @include sm() {
-        padding: ($verticalPadding2 or $verticalPadding) $dymamicHorizontalMargins;
+        padding: ($verticalPadding2 or $verticalPadding) $inverseDynamicHorizontalMargins;
     }
 }
 
 @mixin reversePageMargin($verticalMargin) {
     margin: $verticalMargin (-$staticHorizontalMargins);
     @include sm() {
-        margin: $verticalMargin (-$dymamicHorizontalMargins);
+        margin: $verticalMargin (-$inverseDynamicHorizontalMargins);
     }
 }
 
@@ -271,7 +271,7 @@ section.page.content {
         @include reversePageMargin(2rem);
         width: calc(100% + (2 * #{$staticHorizontalMargins}));
         @include sm() {
-            width: calc(100% + (2 * #{$dymamicHorizontalMargins}));
+            width: calc(100% + (2 * #{$inverseDynamicHorizontalMargins}));
         }
 
         &::before {
@@ -307,7 +307,6 @@ section.page.content {
             border-spacing: 0;
             &.lntable {
                 td:first-child span:not(.hl) {
-                    display: block;
                     padding-right: 1em;
                     padding-left: 0.5em;
                 }
@@ -325,10 +324,61 @@ section.page.content {
         background: white;
     }
 
-    pre > code {
-        font-size: 11px;
-        @include sm() {
-            font-size: 1rem;
+    .collapsable {
+        @include reversePageMargin(3rem);
+
+        // border-top: 1px solid var(--category-color-lighter);
+        background-color: darken($invertedBackground, 3%);
+        // background-color: #1e1e1e;
+        // background-color: $decorationColor;
+
+        > input {
+            display: none;
+            &:checked {
+                & ~ .content {
+                    height: inherit;
+                }
+            }
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+
+            @include sm() {
+                flex-direction: row;
+            }
+
+            padding: 2em $dynamicHorizontalMargins;
+            color: $invertedMediumTextColor;
+            // font-family: $monospaceFont;
+
+            .title {
+                flex-grow: 1;
+            }
+
+            .download {
+                a {
+                    &:hover {
+                        color: $invertedDarkTextColor;
+                    }
+                }
+            }
+        }
+
+        .content {
+            height: 0;
+            overflow: hidden;
+            transition: height 500ms ease-in-out;
+
+            border-left-color: var(--category-color);
+            border-left-width: 1px;
+            border-left-style: solid;
+
+            .highlight {
+                margin: 0;
+                padding: 2em $dynamicHorizontalMargins;
+            }
         }
     }
 }
@@ -380,7 +430,7 @@ section.author {
     gap: 2em;
     margin-top: 8rem;
 
-    background-color: $pageBackground;
+    // background-color: $pageBackground;
 
     @include sm() {
         flex-direction: row;

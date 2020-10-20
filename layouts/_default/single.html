@@ -2,7 +2,12 @@
 {{- if isset .Params "poster" -}} 
     {{- $poster := .Resources.GetMatch .Params.poster -}}
     {{- if $poster -}} 
-        {{- .Scratch.Set "poster" ($poster.Fit "1600x1600 q80 jpg") -}} 
+        {{- .Scratch.Set "poster" ($poster.Fit "1600x1600 q80 jpg") -}}
+    {{- else -}}
+        {{- $poster := resources.Get .Params.poster -}}
+        {{- if $poster -}} 
+            {{- .Scratch.Set "poster" ($poster.Fit "1600x1600 q80 jpg") -}}
+        {{- end -}}
     {{- end -}} 
 {{- end -}} 
 {{- $poster := .Scratch.Get "poster" -}}

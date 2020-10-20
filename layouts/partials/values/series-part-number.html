@@ -2,7 +2,7 @@
 {{- $partNumber := 0 -}}
 {{- if .Parent -}}
     {{- if eq .Parent.Type "series" -}}
-        {{- range $index, $page := .Parent.Pages -}}
+        {{- range $index, $page := .Parent.Pages.Reverse -}}
             {{- if eq $page $.Page -}}
                 {{- $partNumber = (add $index 1 ) -}}
             {{- end -}}

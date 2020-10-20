@@ -1,7 +1,7 @@
-from abc import ABC, ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
 from io import BytesIO
-from typing import Generic, TypeVar, ClassVar, Any, Dict, List, Optional, Type
+from typing import Generic, TypeVar, ClassVar, Any, Dict, Optional, Type
 
 import msgpack
 
@@ -120,61 +120,3 @@ class SerializableSerializer(CustomSerializer[Serializable], code=0x00):
 
     def deserialize(self, data: bytes) -> Optional[Serializable]:
         return Serializable.deserialize(data)
-
-# class TestObject(Serializable, id=0x00):
-#     fields = ["someString", "someInt"]
-
-#     def __init__(self):
-#         super().__init__()
-#         self.someString = "this is a string"
-#         self.someInt = 123
-
-# class SubObject(TestObject, id=0x01):
-#     fields = ["additionalField"]
-
-#     def __init__(self):
-#         super().__init__()
-#         self.additionalField = "this should be added to the others"
-
-# class SubSubObject(SubObject, id=0x02):
-#     fields = ["uselessField"]
-
-#     def __init__(self):
-#         super().__init__()
-#         self.uselessField = "this is useless"
-
-
-class Kapoue(Serializable, id=0x01):
-    fields = ["allo"]
-
-    def __init__(self):
-        self.allo = "toi"
-
-
-class Sample(Serializable, id=0x00):
-    fields = ["foo"]
-
-    def __init__(self, foo: str = None):
-        self.foo = Kapoue()
-
-
-sample = Sample("Hello World!")
-print(sample.foo.allo)
-data = sample.serialize()
-restored = Serializable.deserialize(data)
-print(restored.foo.allo)
-
-# print("-")
-# data = TestObject().serialize()
-# print("-")
-# data = SubObject().serialize()
-# print("-")
-# data = TestObject().serialize()
-# print("-")
-# data = SubObject().serialize()
-# print("-")
-# print(data)
-# print(len(data))
-
-# restored = Serializable.deserialize(data)
-# print(isinstance(restored, TestObject)) # True

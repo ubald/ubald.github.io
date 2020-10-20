@@ -1,17 +1,17 @@
 ---
-title: Python Classes Serialization
+title: Python Class Serialization
 slug: serialization
 categories:
-    - networking
+    - code
 tags:
     - serialization
     - python
     - msgpack
-date: 2020-10-11T00:00:00.000Z
-draft: true
+poster: images/stock/pigeons.jpg
+date: 2020-10-20T00:00:00.000Z
 ---
 
-The first step to tackle before diving into the networking library is the data serialization. It is specific enough to be developed in isolation and will come in handy when the time comes to send and receive test data later in the library development.
+The first step to tackle before diving into the networking library is the data serialization. It is generic enough to be developed in isolation and will come in handy when the time comes to send and receive test data later in the library development.
 
 ###### What is serialization?
 
@@ -268,43 +268,43 @@ Here another side effect of how we construct the class instance is that we _have
 Fortunately, Python is full of useful tricks that we can use to accomplish what we want with minimal impact to the end user. We keep all the complexity encapsulated in the `Serializable` class and expose the least amount of it possible. In Python we can create an instance of a class by calling [\_\_new\_\_](https://docs.python.org/3/reference/datamodel.html#object.__new__) on the class. It will create an instance but will not call `__init__` on the new instance.
 
 ```python {hl_lines=["11"]}
-    @staticmethod
-    def deserialize(data: bytes) -> Optional['Serializable']:
-        with BytesIO(data) as buffer:
-            unpacker = msgpack.Unpacker(buffer, raw=False)
+@staticmethod
+def deserialize(data: bytes) -> Optional['Serializable']:
+    with BytesIO(data) as buffer:
+        unpacker = msgpack.Unpacker(buffer, raw=False)
 
-            class_id = unpacker.unpack()
-            cls = Serializable._classes.get(class_id)
-            if not cls:
-                return None
+        class_id = unpacker.unpack()
+        cls = Serializable._classes.get(class_id)
+        if not cls:
+            return None
 
-            instance = cls.__new__(cls)
-            for field in cls._fields:
-                setattr(instance, field, unpacker.unpack())
+        instance = cls.__new__(cls)
+        for field in cls._fields:
+            setattr(instance, field, unpacker.unpack())
 
-            return instance
+        return instance
 ```
 
 That only gets us a third of the way there though. Because, now, anything that we were relying on from the constructor doesn't get called at all. We can introduce a new convention for this, we can decide that `__init__` is only for setting instance variables from manually constructed classes and introduce an `initialize()` method that can be used to implement initialization logic that depends on those values. The deserializer can call that method once everything is set.
 
 ```python {hl_lines=["15"]}
-    @staticmethod
-    def deserialize(data: bytes) -> Optional['Serializable']:
-        with BytesIO(data) as buffer:
-            unpacker = msgpack.Unpacker(buffer, raw=False)
+@staticmethod
+def deserialize(data: bytes) -> Optional['Serializable']:
+    with BytesIO(data) as buffer:
+        unpacker = msgpack.Unpacker(buffer, raw=False)
 
-            class_id = unpacker.unpack()
-            cls = Serializable._classes.get(class_id)
-            if not cls:
-                return None
+        class_id = unpacker.unpack()
+        cls = Serializable._classes.get(class_id)
+        if not cls:
+            return None
 
-            instance = cls.__new__(cls)
-            for field in cls._fields:
-                setattr(instance, field, unpacker.unpack())
+        instance = cls.__new__(cls)
+        for field in cls._fields:
+            setattr(instance, field, unpacker.unpack())
 
-            instance.initialize()
+        instance.initialize()
 
-            return instance
+        return instance
 ```
 
 We're now two thirds of the way there. We fixed the deserialization, but creating an instance manually won't call the new `initialize()` method. Again, it shouldn't be the end user's responsibility to call this manually.
@@ -446,3 +446,7 @@ Meh
 ### Recursive object
 
 JUST DON'T DO IT
+
+### Complete Class
+
+{{< sourcefile "serializable.py" >}}
