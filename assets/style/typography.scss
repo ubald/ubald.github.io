@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto&family=DM+Serif+Display:ital@0;1&family=Montserrat&family=Fira+Code&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&family=DM+Serif+Display:ital@0;1&family=Fira+Code:wght@400;700&display=swap");
 
 $fontScales: (
     "golden_ratio": 1.618,
@@ -21,13 +21,13 @@ $titleFont: "DM Serif Display", serif;
 $copyFont: "Open Sans", "Montserrat", sans-serif;
 $monospaceFont: "Fira Code", monospace;
 
-$h1Size: 11.089rem;
-$h2Size: 6.854rem;
-$h3Size: 4.236rem;
-$h4Size: 2.618rem;
-$h5Size: 1.618rem;
-$h6Size: 1rem;
-$smallSize: 0.618rem;
+// $h1Size: 11.089rem;
+// $h2Size: 6.854rem;
+// $h3Size: 4.236rem;
+// $h4Size: 2.618rem;
+// $h5Size: 1.618rem;
+// $h6Size: 1rem;
+// $smallSize: 0.618rem;
 
 html {
     font-size: $baseFontSize / 16 * 100%;
@@ -55,32 +55,33 @@ h6 {
     }
 }
 
-@function scale($scale, $level, $size: $baseFontSize) {
+@function calculateScale($scale, $level, $size: $baseFontSize) {
     $newSize: $size * map-get($fontScales, $scale);
-    @if $level < 5 {
-        @return scale($scale, $level + 1, $newSize);
+    @if $level < 6 {
+        @return calculateScale($scale, $level + 1, $newSize);
     } @else {
         @return ($newSize / $baseFontSize) * 1rem;
     }
 }
 
 @mixin fontScale($scale, $level) {
-    font-size: scale($scale, $level);
+    font-size: calculateScale($scale, $level);
 }
 
 @mixin heading($level) {
-    @include fontScale("perfect_fourth", $level);
+    @include fontScale("major_third", $level);
     @include lg() {
-        @include fontScale("augmented_fourth", $level);
+        @include fontScale("perfect_fourth", $level);
     }
     @include xl() {
-        @include fontScale("golden_ratio", $level);
+        @include fontScale("augmented_fourth", $level);
     }
     line-height: 1;
 }
 
 @mixin text($size, $lines) {
-    $lineHeight: $lines * $leading;
+    $lineHeight: $lines * $baseLineHeight;
+    // $lineHeight: $lines * $leading;
     $capHeight: $capHeightRatio * $size;
 
     font-size: $size;
@@ -146,79 +147,106 @@ ul,
 ol {
     margin-top: 1em;
     margin-bottom: 1em;
-    margin-left: 1em;
+    //margin-left: 1em;
     // padding-left: 1em;
     list-style-position: inside;
 
+    ul &,
+    ol & {
+        margin-left: 1em;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
     li {
         text-decoration-color: $decorationColor;
+        & > p {
+            // Markdown conversion adds <p>'s inside ordered list items
+            display: inline;
+        }
     }
 }
 
-li > ul,
-li > ol {
-    margin-top: 0;
-    margin-bottom: 0;
-}
+// table:not(.lntable) {
+//     // border-spacing: 1;
+//     border-collapse: collapse;
+//     // background: white;
+//     overflow: hidden;
+//     // width: 100%;
+//     margin: 0 auto;
+//     position: relative;
 
-table:not(.lntable) {
-    // border-spacing: 1;
-    border-collapse: collapse;
-    // background: white;
-    overflow: hidden;
-    // width: 100%;
-    margin: 0 auto;
-    position: relative;
+//     * {
+//         position: relative;
+//     }
 
-    * {
-        position: relative;
-    }
+//     table td,
+//     table th {
+//         // padding-left: 8px;
+//     }
+//     table thead tr {
+//         height: 60px;
+//         background: #36304a;
+//     }
+//     table tbody tr {
+//         height: 50px;
+//     }
+//     table tbody tr:last-child {
+//         border: 0;
+//     }
+//     table td,
+//     table th {
+//         text-align: left;
+//     }
 
-    table td,
-    table th {
-        // padding-left: 8px;
-    }
-    table thead tr {
-        height: 60px;
-        background: #36304a;
-    }
-    table tbody tr {
-        height: 50px;
-    }
-    table tbody tr:last-child {
-        border: 0;
-    }
-    table td,
-    table th {
-        text-align: left;
-    }
+//     tbody tr:nth-child(even) {
+//         background-color: #f5f5f5;
+//     }
 
-    tbody tr:nth-child(even) {
-        background-color: #f5f5f5;
-    }
+//     tbody tr {
+//         color: #808080;
+//         line-height: 1.2;
+//         font-weight: unset;
+//     }
 
-    tbody tr {
-        color: #808080;
-        line-height: 1.2;
-        font-weight: unset;
-    }
+//     tbody tr:hover {
+//         color: #555555;
+//         background-color: #f5f5f5;
+//         cursor: pointer;
+//     }
+// }
 
-    tbody tr:hover {
-        color: #555555;
-        background-color: #f5f5f5;
-        cursor: pointer;
+dl {
+    dt {
+        font-weight: bold;
+    }
+    dd {
+        margin-bottom: 1em;
     }
 }
 
 code,
 pre {
     font-family: "Fira Code", Menlo, Consolas, "Courier New", Courier, monospace;
-    font-size: 1rem;
+
+    font-size: 11px;
+    line-height: 1.5;
+    @include sm() {
+        font-size: 1rem;
+        line-height: $baseLineHeight;
+    }
 }
 
 p code {
-    padding: 0.25em 0.5em;
-    border-radius: 0.5em;
+    padding: 0.125em 0.5em;
+    border-radius: 0.25em;
+
+    font-size: 0.9rem;
+    font-weight: bold;
+
+    color: $textColor !important;
+    background-color: darken($pageBackground, 5%);
+    // background-color: var(--category-color-lighter);
 }
 
 blockquote {

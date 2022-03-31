@@ -1,17 +1,23 @@
 ---
-title: "I need to rant about code again!"
-category: rants
-poster: UB5D9295_3k_90.jpg
-summary: But first let me finish my website
-date: 2020-09-13
-categories: rant technology
+title: Psychic Lights
+categories:
+    - algorithm
+    - architecture
+    - code
+    - some
+    - more
+    - words
+    - for
+    - fun
+date: 2020-09-20
+draft: true
 ---
 
 <!-- ![Test Image](/assets/images/2020-09-13-i-need-to-rant-about-code/butterblume.jpg) -->
 
 ## First, let me finish my fucking site
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
+[Lorem ipsum]() dolor sit amet, `consectetur` adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam.
 
 > Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
 
@@ -29,23 +35,7 @@ Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis fauci
 
 ## Second, let me write some content
 
-![Kali](UB5D0638.jpg)
-
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus.
-    Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem.
-    Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus.
-    Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
-    Aenean accumsan enim sed iaculis pretium.
-    Aliquam pellentesque felis turpis, ut eleifend ex consectetur vitae.
-    Maecenas ultricies arcu a laoreet egestas.
-    Duis nunc diam, varius a neque ac, auctor finibus risus.
-    Praesent eu viverra odio, at imperdiet magna.
-    Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus.
-    Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris `quis` elit tempus, elementum ipsum ac, porttitor urna. Aenean accumsan enim sed iaculis pretium. Aliquam pellentesque felis turpis, ut `eleifend ex consectetur` vitae. Maecenas ultricies arcu a laoreet egestas. Duis nunc diam, varius a neque ac, auctor finibus risus. Praesent eu viverra odio, at imperdiet magna. Sed et blandit diam. Maecenas magna leo, consectetur a nisi eget, lobortis faucibus metus. Mauris quis elit tempus, elementum ipsum ac, porttitor urna.
 
 ### Aenean accumsan enim
 

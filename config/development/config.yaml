@@ -1,0 +1,3 @@
+buildDrafts: true
+buildFuture: true
+paginate: 4

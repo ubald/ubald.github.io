@@ -1,0 +1,615 @@
+$headerHeight: 6rem;
+$dynamicHorizontalMargins: 10%;
+$staticHorizontalMargins: 1rem;
+$inverseDynamicHorizontalMargins: (100% * $dynamicHorizontalMargins) / (100% - (2 * $dynamicHorizontalMargins));
+$pageVerticalMargins: 8rem;
+
+@mixin pagePadding($verticalPadding) {
+    padding: $verticalPadding $staticHorizontalMargins;
+    @include sm() {
+        padding: $verticalPadding $dynamicHorizontalMargins;
+    }
+}
+
+@mixin pagePaddingForReversePageMargin($verticalPadding, $verticalPadding2: null) {
+    padding: $verticalPadding $staticHorizontalMargins;
+    @include sm() {
+        padding: ($verticalPadding2 or $verticalPadding) $inverseDynamicHorizontalMargins;
+    }
+}
+
+@mixin reversePageMargin($verticalMargin) {
+    margin: $verticalMargin (-$staticHorizontalMargins);
+    @include sm() {
+        margin: $verticalMargin (-$inverseDynamicHorizontalMargins);
+    }
+}
+
+body {
+    background-color: $invertedBackground;
+}
+
+.container {
+    margin: 0 auto;
+    min-height: 100vh;
+    max-width: 1200px;
+}
+
+header.main-header {
+    display: flex;
+    align-items: center;
+    height: $headerHeight;
+    @include pagePadding(0);
+}
+
+.site-logo {
+    font-family: $monospaceFont;
+    font-size: 1.5rem;
+    line-height: 2;
+    margin: 0;
+    color: $invertedForegroundColor;
+    .dot {
+        color: $invertedTitleColor;
+    }
+}
+
+nav.menu {
+    display: flex;
+    justify-content: flex-end;
+    flex-grow: 1;
+    > ul {
+        display: flex;
+        align-items: center;
+        gap: 1em;
+        margin: 0;
+        list-style: none;
+
+        footer & {
+            flex-direction: column;
+            @include sm() {
+                flex-direction: row;
+            }
+        }
+    }
+}
+
+header.list-header {
+    @include pagePadding(4rem);
+    display: flex;
+    flex-direction: column;
+    background-color: var(--category-color);
+    .term {
+        font-family: $monospaceFont;
+        color: $invertedForegroundColor;
+    }
+    h2 {
+        margin: 0;
+    }
+}
+
+header.cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    min-height: calc(100vh - #{$headerHeight});
+    @include pagePadding(0);
+
+    > .metadata {
+        flex-direction: column;
+        padding: 4em 0;
+
+        @include sm() {
+            flex-direction: row;
+            align-items: center;
+        }
+
+        > div {
+            align-items: center;
+            gap: 1em;
+
+            @include sm() {
+                align-items: flex-start;
+                gap: 0.25em;
+            }
+
+            .byline {
+                text-align: center;
+                @include sm() {
+                    text-align: left;
+                }
+            }
+
+            .labels {
+                justify-content: center;
+                @include sm() {
+                    justify-content: flex-start;
+                }
+            }
+        }
+    }
+}
+
+img.poster {
+    position: fixed;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    object-fit: cover;
+    filter: grayscale(50%) opacity(15%);
+    z-index: -1;
+}
+
+.titling {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+
+    > h1 {
+        margin-top: 0;
+        margin-bottom: 0.25em;
+
+        color: var(--category-color);
+        .home & {
+            color: $blue;
+        }
+    }
+
+    > h3 {
+        @include heading(5);
+        font-family: $monospaceFont;
+        margin-bottom: 0;
+    }
+
+    > .excerpt {
+        @include lg {
+            font-size: 1.5rem;
+        }
+    }
+}
+
+.subtitle {
+    color: $invertedDarkTextColor;
+}
+
+footer.main-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+
+    @include pagePadding(3em);
+
+    color: $invertedMediumTextColor;
+    text-align: center;
+
+    @include sm() {
+        flex-direction: row;
+        flex-wrap: wrap;
+        text-align: left;
+    }
+
+    .copyright {
+        width: 100%;
+        padding-top: 3em;
+    }
+}
+
+section.page.content {
+    @include pagePadding($pageVerticalMargins);
+
+    background-color: $pageBackground;
+
+    // Margin hover anchors
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        position: relative;
+
+        // Margin anchor on hover, only enable when small or larger
+        @include sm() {
+            margin-left: (-$dynamicHorizontalMargins);
+            padding-left: $dynamicHorizontalMargins;
+            &:hover > a {
+                display: flex;
+            }
+        }
+
+        color: $headingColor;
+
+        &:target {
+            color: var(--category-color);
+        }
+    }
+
+    a {
+        color: var(--category-color);
+        font-weight: bold;
+
+        &:hover,
+        &:active {
+            color: $textColor;
+        }
+
+        &.anchor {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 0;
+            width: $dynamicHorizontalMargins;
+            height: 100%;
+            > i {
+                font-size: 2rem;
+                color: $decorationColor;
+            }
+        }
+    }
+
+    p {
+    }
+
+    > p:first-child {
+        > img {
+            margin-top: -$pageVerticalMargins;
+        }
+    }
+
+    hr {
+    }
+
+    p > img {
+        object-fit: scale-down;
+        @include reversePageMargin(2rem);
+        width: calc(100% + (2 * #{$staticHorizontalMargins}));
+        @include sm() {
+            width: calc(100% + (2 * #{$inverseDynamicHorizontalMargins}));
+        }
+
+        &::before {
+            display: block;
+            color: $subduedTextColor;
+            font-style: italic;
+            text-align: center;
+            @include pagePadding(0);
+        }
+    }
+
+    figure {
+        @include reversePageMargin(2rem);
+
+        > img {
+            margin: 0.5em auto;
+            max-width: 100%;
+        }
+
+        figcaption {
+            color: $subduedTextColor;
+            font-style: italic;
+            text-align: center;
+            @include pagePadding(0);
+        }
+    }
+
+    div.highlight {
+        @include reversePageMargin(2rem);
+        @include pagePaddingForReversePageMargin(4em);
+        overflow-x: auto;
+        table {
+            border-spacing: 0;
+            &.lntable {
+                td:first-child span:not(.hl) {
+                    padding-right: 1em;
+                    padding-left: 0.5em;
+                }
+                td:nth-child(2) {
+                    min-width: 100%;
+                }
+            }
+        }
+    }
+
+    > pre {
+        margin: 2em 0;
+        padding: 2em 3em;
+        overflow-x: auto;
+        background: white;
+    }
+
+    .collapsable {
+        @include reversePageMargin(3rem);
+
+        // border-top: 1px solid var(--category-color-lighter);
+        background-color: darken($invertedBackground, 3%);
+        // background-color: #1e1e1e;
+        // background-color: $decorationColor;
+
+        > input {
+            display: none;
+            &:checked {
+                & ~ .content {
+                    height: inherit;
+                }
+            }
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+
+            @include sm() {
+                flex-direction: row;
+            }
+
+            padding: 2em $dynamicHorizontalMargins;
+            color: $invertedMediumTextColor;
+            // font-family: $monospaceFont;
+
+            .title {
+                flex-grow: 1;
+            }
+
+            .download {
+                a {
+                    &:hover {
+                        color: $invertedDarkTextColor;
+                    }
+                }
+            }
+        }
+
+        .content {
+            height: 0;
+            overflow: hidden;
+            transition: height 500ms ease-in-out;
+
+            border-left-color: var(--category-color);
+            border-left-width: 1px;
+            border-left-style: solid;
+
+            .highlight {
+                margin: 0;
+                padding: 2em $dynamicHorizontalMargins;
+            }
+        }
+    }
+}
+
+.series-intro {
+    @include reversePageMargin(3rem);
+    @include pagePaddingForReversePageMargin($pageVerticalMargins/2);
+    background-color: var(--category-color);
+
+    // border-left: 1em solid var(--category-color-dark);
+
+    p {
+        font-size: 1.25rem;
+    }
+
+    &:first-child {
+        margin-top: (-$pageVerticalMargins);
+    }
+
+    &:not(:first-child) {
+        margin-top: 3em;
+    }
+
+    a {
+        font-weight: normal;
+        color: $textColor !important;
+        &.active {
+            color: inherit !important;
+        }
+    }
+
+    li {
+        color: var(--category-color-darker);
+        &::marker {
+            color: var(--category-color-darker);
+        }
+    }
+
+    & + hr {
+        display: none;
+    }
+}
+
+section.author {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    align-items: center;
+    gap: 2em;
+    margin-top: 8rem;
+
+    // background-color: $pageBackground;
+
+    @include sm() {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 3em;
+    }
+
+    img.avatar {
+        flex-shrink: 0;
+        border-radius: 50%;
+    }
+
+    .bio {
+        text-align: center;
+
+        @include sm() {
+            text-align: left;
+        }
+
+        .author {
+            font-family: $titleFont;
+            font-size: 2rem;
+            a {
+                color: var(--category-color-dark);
+            }
+        }
+    }
+}
+
+ol.posts {
+    margin: 0;
+
+    > li {
+        list-style: none;
+        margin-top: 4rem;
+    }
+}
+
+article.preview {
+    @include pagePadding(0);
+
+    > header {
+        margin-bottom: 1rem;
+
+        > h3 {
+            // @include heading(3);
+            // margin-bottom: 0.25em;
+            margin-top: 0;
+            a {
+                color: var(--category-color);
+            }
+        }
+
+        > h4 {
+            @include heading(6);
+            font-family: $monospaceFont;
+            margin-bottom: 0;
+        }
+    }
+
+    // .excerpt {
+    //     @include sm() {
+    //         @include heading(6);
+    //         line-height: 1.25;
+    //     }
+    // }
+}
+
+ul.pagination {
+    margin: 0;
+    margin-top: 6rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 1.5rem;
+    > li {
+        list-style: none;
+        a {
+            color: $invertedDarkTextColor;
+            &:hover {
+                color: $invertedMediumTextColor;
+            }
+            &:active {
+                color: $invertedTitleColor;
+            }
+        }
+        &.active {
+            a {
+                color: $invertedMediumTextColor;
+                &:hover {
+                    color: $invertedMediumTextColor;
+                }
+                &:active {
+                    color: $invertedTitleColor;
+                }
+            }
+        }
+    }
+}
+
+.metadata {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1em;
+
+    > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25em;
+
+        .byline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+
+            @include sm() {
+                flex-direction: row;
+                gap: 0.5em;
+            }
+        }
+    }
+
+    .avatar {
+        width: 3em;
+        height: 3em;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid $invertedMediumTextColor;
+    }
+
+    .author {
+    }
+
+    .date {
+        color: $invertedMediumTextColor;
+    }
+
+    .read-time {
+        background-color: $decorationColor;
+    }
+
+    ul.labels {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5em;
+        margin: 0;
+
+        li {
+            font-size: 0.85rem;
+            font-weight: bold;
+            list-style: none;
+            border-radius: 0.5em;
+            padding: 0 0.5em 0.15em 0.5em;
+            a {
+                color: inherit;
+            }
+        }
+    }
+}
+
+.label {
+    // This one doesn't use the variable since we want a default color
+    @include categoryLabelColor();
+}
+
+.excerpt {
+    font-family: $monospaceFont;
+    color: $invertedMediumTextColor;
+    font-size: 1rem;
+    line-height: 1.25;
+
+    .prompt {
+        color: $invertedForegroundColor;
+    }
+}
+
+.copyright {
+    font-size: 0.85em;
+    font-style: italic;
+}

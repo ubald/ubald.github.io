@@ -1,0 +1,10 @@
+{{ $logo := .Page.Resources.GetMatch (.Get "logo") }}
+{{ $logo = $logo.Fit "128x128 png" }}
+<section class="job">
+    <img src="{{ $logo.Permalink }}" class="logo" aria-hidden="true"/>
+    <h4 id='{{ urlize (.Get "company") }}-{{ urlize (.Get "title") }}' class="title">{{ .Get "title" }}</h4>
+    <h3 id='{{ urlize (.Get "company") }}' class="company">{{ .Get "company" }}</h3>
+    <div class="date">{{ .Get "date" }}</div>
+    <div class="location">{{ .Get "location" }}</div>
+    <div class="description">{{ .Inner }}</div>
+</section>

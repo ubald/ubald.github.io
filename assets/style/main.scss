@@ -1,0 +1,56 @@
+// Atom One Dark
+$light: #abb2bf;
+$medium: #828997;
+$dark: #5c6370;
+$foreground: #abb2bf;
+$background: #282c34;
+$gutter: #636d83;
+$guide: rgba(171, 178, 191, 0.15);
+
+$purple: #c678dd;
+$blue: #61afef;
+$cyan: #56b6c2;
+$green: #98c379;
+$yellow: #e5c07b;
+$orange: #d19a66;
+$red: #be5046;
+
+$blue_accent: #528bff;
+
+// $purple: #d883ff;
+// $blue: #33a8c7;
+// $cyan: #52e3e1;
+// $green: #a0e426;
+// $yellow: #fdf148;
+// $orange: #ffab00;
+// $red: #f77976;
+
+// Ubald.dev
+// $magenta: #c1a2be;
+// $purple: #a7a2c1;
+// $blue: #a2bdc1;
+// $cyan: #a2c1c1;
+// $green: #a4c1a2;
+// $yellow: #c1bca2;
+// $orange: #c1b0a2;
+// $red: #c1a2a2;
+
+$invertedBackground: #222;
+$invertedTitleColor: $blue;
+$invertedForegroundColor: #eee;
+$invertedMediumTextColor: #aaa;
+$invertedDarkTextColor: #666;
+$invertedLinkColor: #eee;
+$pageBackground: #f6f6f6; // #eee
+$headingColor: #3c3c3c;
+$textColor: #333;
+$subduedTextColor: #777;
+$decorationColor: #ccc;
+
+@import "mixins";
+@import "coloring";
+@import "reset";
+@import "base";
+@import "typography";
+@import "layout";
+@import "syntax";

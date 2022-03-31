@@ -1,0 +1,20 @@
+{{- $filename := .Get 0 }}
+{{- $res := .Page.Resources.GetMatch $filename }}
+
+{{- if strings.HasSuffix $filename ".py" }}
+{{- .Scratch.Set "language" "python" }}
+{{- end }}
+
+{{- $path := printf "%s%s" .Page.File.Dir $filename }}
+{{- $file := readFile $path }}
+
+<aside class="collapsable">
+    <input id="toggle-{{ $filename | base64Encode }}" type="checkbox"/>
+    <label for="toggle-{{ $filename | base64Encode }}">
+        <div class="title"><i class="far fa-file-alt"></i>&nbsp;Expand <code>{{ $filename }}</code> source.</div>
+        <div class="download"><a href="{{ $res.Permalink }}"><i class="fas fa-file-download"></i>&nbsp;Download</a></div>
+    </label>
+    <div class="content">
+        {{ highlight $file (.Scratch.Get "language") "" }}
+    </div>
+</aside>

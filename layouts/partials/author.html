@@ -9,11 +9,11 @@
     {{- end -}} 
     {{- $avatar := .Scratch.Get "avatar" -}}
     {{- if $avatar }}
-    <img src="{{ $avatar.Permalink }}" class="avatar" />
+    <img src="{{ $avatar.Permalink }}" class="avatar" aria-hidden="true"/>
     {{- end }}
-    <div class="bio">
-        <span class="author">
-            <a href="{{ .Permalink }}">{{ .Params.name }}</a>
+    <div class="bio" aria-label="Author's biography">
+        <span class="author" aria-label="Author">
+            <a href="{{ .Permalink }}" title="Author name">{{ .Params.name }}</a>
         </span>
         <p>{{ .Summary }}</p>
     </div>

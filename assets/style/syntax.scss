@@ -23,7 +23,6 @@ $hue-6-2: hsl(39, 67%, 69%); // <-orange 2
 // Base colors -----------------------------------
 $syntax-fg: $mono-1;
 $syntax-bg: hsl($syntax-hue, $syntax-saturation, $syntax-brightness);
-// $syntax-bg: $invertedBackground;
 $syntax-gutter: darken($syntax-fg, 26%);
 $syntax-guide: fade($syntax-fg, 15%);
 $syntax-accent: hsl($syntax-hue, 100%, 66%);
@@ -93,6 +92,10 @@ pre.highlight,
     pre {
         background: $syntax-bg;
     }
+    .hl {
+        display: block;
+        background: darken($syntax-bg, 5%);
+    }
     .hll {
         background: $syntax-bg;
     }
@@ -114,7 +117,7 @@ pre.highlight,
         color: $mono-1;
     } /* Name */
     .o {
-        color: $mono-1;
+        color: $mono-2; //$mono-1;
     } /* Operator */
     .p {
         color: $mono-1;
@@ -172,7 +175,7 @@ pre.highlight,
         color: $hue-6;
     } /* Name.Attribute */
     .nb {
-        color: $hue-6-2;
+        color: $hue-1; //$hue-6-2;
     } /* Name.Builtin */
     .nc {
         color: $hue-6-2;
@@ -190,8 +193,11 @@ pre.highlight,
         color: $hue-6-2;
     } /* Name.Exception */
     .nf {
-        color: $mono-1;
+        color: $hue-2; //$mono-1;
     } /* Name.Function */
+    .fm {
+        color: $hue-1;
+    } /* Built in function */
     .nl {
         color: $hue-6-2;
     } /* Name.Label */
@@ -293,8 +299,12 @@ pre.highlight,
         color: $syntax-gutter-text-color;
     } /* Line number */
 
+    .vm {
+        color: $hue-5;
+    }
+
     ::selection {
-        color: $syntax-fg;
+        color: unset; // $syntax-fg;
         background-color: $syntax-selection-color;
     }
 
@@ -314,11 +324,4 @@ pre.highlight,
     .language-csharp {
         // csharp related modifications
     }
-}
-
-// Customizations
-
-p code {
-    color: $syntax-text-color;
-    background-color: $syntax-background-color;
 }

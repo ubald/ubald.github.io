@@ -1,0 +1,5 @@
+baseURL: https://ubald.dev/
+googleAnalytics: UA-151413561-2
+paginate: 12
+minify:
+    minifyOutput: true

@@ -9,14 +9,14 @@
 {{ $poster := .Scratch.Get "poster" }}
 
 <article class="home">
-    <header>
+    <header class="cover">
         {{ if $poster }}
-        <img src="{{ $poster.Permalink }}" class="poster" />
+        <img src="{{ $poster.Permalink }}" class="poster" aria-hidden="true"/>
         {{ end }}
         <div class="titling">
-            <h1 class="title">{{ .Params.title }}</h1>
+            <h1 class="title" aria-label="Titla">{{ .Params.title }}</h1>
             {{ with .Summary }}
-            <div class="excerpt">
+            <div class="excerpt" aria-label="Excerpt">
                 &gt;&nbsp;{{ . }}
             </div>
             {{ end }}

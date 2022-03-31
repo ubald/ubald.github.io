@@ -8,14 +8,29 @@ params:
 copyright: ©2020 François Ubald Brien. All rights reserved.
 languageCode: en-us
 
-# googleAnalytics: UA-123-45
+menu:
+    main:
+        - identifier: articles
+          name: Articles
+          url: /articles/
+          weight: 10
+        - identifier: about
+          name: About
+          url: /about/
+
+enableEmoji: true
+disableHugoGeneratorInject: true
+enableRobotsTXT: true
+
+summaryLength: 30
+
+permalinks:
+    articles: /:sections/:slug
 
 taxonomies:
     author: authors
     tag: tags
     category: categories
-
-paginate: 12
 
 imaging:
     resampleFilter: lanczos

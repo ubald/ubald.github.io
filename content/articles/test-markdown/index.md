@@ -2,7 +2,13 @@
 title: Markdown Test
 excerpt: Testing most of the markdown syntax styles but with a long excerpt because I need a multiline excerpt
 poster: stock/ice.jpg
-categories: test markdown
+categories:
+    - test
+    - rant
+    - markdown
+    - rant
+    - code
+draft: true
 ---
 
 # h1 Heading 8-)
@@ -19,7 +25,7 @@ categories: test markdown
 
 ## Horizontal Rules
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+[Lorem ipsum]() dolor sit amet, `consectetur` adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a diam, eget fringilla lectus. Morbi ex risus, euismod vitae arcu vitae, tincidunt scelerisque sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 ---
 

@@ -1,0 +1,13 @@
+::selection {
+    color: $textColor;
+    background-color: var(--category-color);
+}
+
+a:focus {
+    text-decoration: underline;
+}
+
+a:active,
+a:hover {
+    text-decoration: none;
+}

@@ -1,40 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+    {{ partial "internal/analytics" . -}}
     <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>{{ .Title }} | {{ .Site.Title }}</title>
-    {{ $sass := resources.Get "sass/main.scss" | resources.ToCSS (dict "outputStyle" "compressed" "enableSourceMap" true) | fingerprint -}}
-    <link rel="stylesheet" href="{{ $sass.Permalink }}" />
-    <script src="https://kit.fontawesome.com/7f3bbce892.js" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ partial "values/title" . }}</title>
+    <meta name="description" content="{{ .Params.Description | default .Params.Summary | default .Site.Params.Description }}"/>
+    {{ $sass := resources.Get "style/main.scss" | resources.ToCSS (dict "outputStyle" "compressed" "enableSourceMap" true) | fingerprint -}}
+    <link rel="stylesheet" href="{{ $sass.Permalink }}" media="screen"/>
+    <script src="https://kit.fontawesome.com/7f3bbce892.js" crossorigin="anonymous" defer></script>
     {{ range .AlternativeOutputFormats }}
     <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ $.Site.Title | safeHTML }}" />
-    {{ end }}
-    {{ template "_internal/opengraph.html" . -}}
-    {{- template "_internal/twitter_cards.html" . -}}
+    {{- end -}}
+    {{- partial "internal/meta" . -}}
 </head>
-
 <body>
     <div class="container">
-        <header>
-            <h1>
-                <a href="/">Ubald<span class="dot">.</span>dev</a>
-            </h1>
-            <nav>
-                <ul>
-                    <li><a href="/articles">Rants</a></li>
-                    <li><a href="/about">About</a></li>
-                </ul>
-            </nav>
+        <header class="main-header">
+            {{ partial "logo" . }}
+            {{ partial "menu" . }}
         </header>
         <main>
-            {{ block "main" . }}
-            {{ end }}
+            {{ block "main" . }}{{ end }}
         </main>
-        <footer>&copy;2020 Fran&ccedil;ois Ubald Brien. All rights reserved.</footer>
+        <footer class="main-footer">
+            {{ partial "logo" . }}
+            {{ partial "menu" . }}
+            <div class="copyright">{{ .Site.Copyright }}</div>
+        </footer>
     </div>
     <script src="/js/script.js"></script>
 </body>
-
 </html>

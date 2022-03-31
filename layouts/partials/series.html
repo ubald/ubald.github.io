@@ -1,0 +1,10 @@
+{{ if eq .CurrentSection.Params.Type "series" }}
+<aside class="series-intro">
+    {{ .CurrentSection.Content }}
+    <ul>
+        {{ range .CurrentSection.Pages.Reverse }}
+            <li><a href="{{ .Permalink }}" class='{{ if eq . $.Page }}active{{ end }}' title="{{ .Title }}">Part {{ partial "values/series-part-number" . }} - {{ .Title }}</a></li>
+        {{ end }}
+    </ul>
+</aside>
+{{ end }}
