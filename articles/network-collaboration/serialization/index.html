@@ -1,0 +1,765 @@
+<!doctype html><html lang=en><head><script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-151413561-2','auto');ga('send','pageview');</script><script async src=https://www.google-analytics.com/analytics.js></script><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Python Class Serialization - Network Collaboration Part 2 | Ubald.dev</title><meta name=description content="Hi, my name is Ubald and this is me ranting about code."><link rel=stylesheet href=https://ubald.dev/style/main.6cb81122b42bf3c09c209e0322d527affe491fcfd090b28b0d179283a2aa2ae2.css media=screen><script src=https://kit.fontawesome.com/7f3bbce892.js crossorigin=anonymous defer></script><meta itemprop=name content="Python Class Serialization"><meta itemprop=description content="The first step to tackle before diving into the networking library is the data serialization. It is generic enough to be developed in isolation and will come in handy when the time comes to send and receive test data later in the library development."><meta itemprop=datePublished content="2020-10-20T00:00:00+00:00"><meta itemprop=dateModified content="2020-10-20T00:00:00+00:00"><meta itemprop=wordCount content="3521"><meta itemprop=keywords content="serialization,python,msgpack,"><meta property="og:title" content="Python Class Serialization"><meta property="og:description" content="The first step to tackle before diving into the networking library is the data serialization. It is generic enough to be developed in isolation and will come in handy when the time comes to send and receive test data later in the library development."><meta property="og:type" content="article"><meta property="og:url" content="https://ubald.dev/articles/network-collaboration/serialization/"><meta property="article:published_time" content="2020-10-20T00:00:00+00:00"><meta property="article:modified_time" content="2020-10-20T00:00:00+00:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="Python Class Serialization"><meta name=twitter:description content="The first step to tackle before diving into the networking library is the data serialization. It is generic enough to be developed in isolation and will come in handy when the time comes to send and receive test data later in the library development."></head><body><div class=container><header class=main-header><h1 class=site-logo><a href=/ title="Ubald.dev Home">Ubald<span class=dot>.</span>dev</a></h1><nav class=menu role=navigation><ul><li><a href=/articles/ title=Articles>Articles</a></li><li><a href=/about/ title=About>About</a></li></ul></nav></header><main><article class="page type-articles category-code"><header class=cover><div class=titling><h3 class=subtitle aria-label="Post series">Network Collaboration Part 2</h3><h1 class=title aria-label="Post title">Python Class Serialization</h1><div class=excerpt aria-label=Excerpt><span class=prompt>></span>&nbsp;The first step to tackle before diving into the networking library is the data serialization. It is generic enough to be developed in isolation and will come in handy when the time comes to send and receive test data later in the library development.</div></div><div class=metadata><a href=https://ubald.dev/about/ title=Author><img src=https://ubald.dev/about/avatar_hu5e33536049a2f51a6d68033afee7db6a_45895_128x128_fit_q80_lanczos.jpg class=avatar title=Avatar aria-hidden=true></a><div><div class=byline><span class=author aria-label=Author><a href=https://ubald.dev/about/ title=Author>François Ubald Brien</a></span>
+<span class=date title="Published date">Tuesday, October 20, 2020</span></div><ul class=labels><li class=read-time title="Reading time"><i class="far fa-clock"></i>17 minutes</li><li class="category category-code label" title="Category Code"><a href=/categories/code>Code</a></li><li class="tag tag-serialization label" title="Tag Serialization"><a href=/tags/serialization>#serialization</a></li><li class="tag tag-python label" title="Tag Python"><a href=/tags/python>#python</a></li><li class="tag tag-msgpack label" title="Tag Msgpack"><a href=/tags/msgpack>#msgpack</a></li></ul></div></div></header><section class="content page"><aside class=series-intro><p>This article is part of a series documenting the development of a framework powering collaborative editing experiences where networked clients control a shared state on the server. It is based on open source work done as part of the <a href=https://sat.qc.ca/recherche/metalab>Metalab</a> team of the <a href=https://sat.qc.ca>Société des Arts Technologiques</a> from 2017 to 2018. The source code is still evolving today and is available on the <a href=https://gitlab.com/sat-metalab/py-satnet>Metalab&rsquo;s Gitlab</a>.</p><ul><li><a href=https://ubald.dev/articles/network-collaboration/introduction/ title="Networking Library Requirements">Part 1 - Networking Library Requirements</a></li><li><a href=https://ubald.dev/articles/network-collaboration/serialization/ class=active title="Python Class Serialization">Part 2 - Python Class Serialization</a></li></ul></aside><p>The first step to tackle before diving into the networking library is the data serialization. It is generic enough to be developed in isolation and will come in handy when the time comes to send and receive test data later in the library development.</p><h6 id=what-is-serialization>What is serialization?</h6><p>Serialization is the process of converting objects into a textual or binary format so that they can be stored or transmitted and restored later. The reverse process is called deserialization, where that same textual or binary data is restored into the original objects that were serialized.</p><h3 id=different-approaches-to-serialization>Different approaches to serialization</h3><p>There are different approaches to serialization each with their pros ans cons. Here it&rsquo;s important to define what we want from our serialization and how we want to use it. Some ready-made solutions, like simply using a JSON encoder might be enticing at first but it doesn&rsquo;t always end up being the right solution. While a simple JSON stringification might be the right approach for some projects, in our case we are developing for a networked editor that will stream animated 3D scenes to multiple clients simultaneously so we have a specific set of requirements.</p><h4 id=our-requirements>Our requirements</h4><ul><li>Encoding/decoding must be <em>fast</em></li><li>Encoded data must be lightweight</li><li>It should not only serialize plain objects but be able to restore to class instances</li><li>It should be easy to add serialization to a class</li></ul><h5 id=sample-code>Sample code</h5><p>Let&rsquo;s use this simple class as a sample object to serialize.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1>1
+</span><span class=lnt id=2>2
+</span><span class=lnt id=3>3
+</span><span class=lnt id=4>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=k>class</span> <span class=nc>TestObject</span><span class=p>:</span>
+    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>someString</span> <span class=o>=</span> <span class=s2>&#34;this is a string&#34;</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>someInt</span> <span class=o>=</span> <span class=mi>123</span>
+</code></pre></td></tr></table></div></div><h5 id=using-json>Using JSON</h5><p>We can use the <a href=https://docs.python.org/3/library/json.html>JSON</a> encoding from the standard library. With it we can&rsquo;t directly serialize a class instance to JSON, but we can encode the instance&rsquo;s <code>__dict__</code> like this:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1>1
+</span><span class=lnt id=2>2
+</span><span class=lnt id=3>3
+</span><span class=lnt id=4>4
+</span><span class=lnt id=5>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=kn>import</span> <span class=nn>json</span>
+
+<span class=n>data</span> <span class=o>=</span> <span class=n>json</span><span class=o>.</span><span class=n>dumps</span><span class=p>(</span><span class=n>TestObject</span><span class=p>(),</span> <span class=n>default</span><span class=o>=</span><span class=k>lambda</span> <span class=n>x</span><span class=p>:</span> <span class=n>x</span><span class=o>.</span><span class=vm>__dict__</span><span class=p>)</span>
+<span class=k>print</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=c1># { &#34;someString&#34;: &#34;this is a string&#34;, &#34;someInt&#34;: 123 }</span>
+<span class=k>print</span><span class=p>(</span><span class=nb>len</span><span class=p>(</span><span class=n>data</span><span class=p>))</span> <span class=c1># 50</span>
+</code></pre></td></tr></table></div></div><p>This amounts to 50 bytes of data, which is more than just the space required for the values. Including property names in JSON is useful to restore plain objects and for human readability but it takes valuable space. Additionally, all the markup necessary to delimit property names and values, the double-quotes, colons and brackets, use valuable bytes in the serialized payload.</p><h5 id=using-pickle>Using Pickle</h5><p>Another option from the standard library is <a href=https://docs.python.org/3/library/pickle.html>pickle</a>. It allows for an efficient binary representation of objects that can easily be restored to instances of the original class. Let use the same sample class and see how the output compares.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1>1
+</span><span class=lnt id=2>2
+</span><span class=lnt id=3>3
+</span><span class=lnt id=4>4
+</span><span class=lnt id=5>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=kn>import</span> <span class=nn>pickle</span>
+
+<span class=n>data</span> <span class=o>=</span> <span class=n>pickle</span><span class=o>.</span><span class=n>dumps</span><span class=p>(</span><span class=n>TestObject</span><span class=p>())</span>
+<span class=k>print</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=c1># b&#39;\x80\x04\x95O\x00\x00\x00\x00\x00\x00\x00\x8c\x08__main__\x94\x8c\nTestObject\x94\x93\x94)\x81\x94}\x94(\x8c\nsomeString\x94\x8c\x10this is a string\x94\x8c\x07someInt\x94K{ub.&#39;</span>
+<span class=k>print</span><span class=p>(</span><span class=nb>len</span><span class=p>(</span><span class=n>data</span><span class=p>))</span> <span class=c1># 90</span>
+</code></pre></td></tr></table></div></div><p>This amounts to 90 bytes of data, substantially more than JSON. Fortunately, this format allows for direct reconstruction of the original instance which can be demonstrated like this:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1>1
+</span><span class=lnt id=2>2
+</span><span class=lnt id=3>3
+</span><span class=lnt id=4>4
+</span><span class=lnt id=5>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=kn>import</span> <span class=nn>pickle</span>
+
+<span class=n>data</span> <span class=o>=</span> <span class=n>pickle</span><span class=o>.</span><span class=n>dumps</span><span class=p>(</span><span class=n>TestObject</span><span class=p>())</span>
+<span class=n>restored</span> <span class=o>=</span> <span class=n>pickle</span><span class=o>.</span><span class=n>loads</span><span class=p>(</span><span class=n>data</span><span class=p>)</span>
+<span class=k>print</span><span class=p>(</span><span class=nb>isinstance</span><span class=p>(</span><span class=n>restored</span><span class=p>,</span> <span class=n>TestObject</span><span class=p>))</span> <span class=c1># True</span>
+</code></pre></td></tr></table></div></div><p>but it is still <em>a lot</em> of data to move around if we want to be efficient. Also, another downside of this method is that this format is Python-specific. If we were to implement a client in a language other that Python, we&rsquo;d need to re-implement this Python encoding in another language.</p><h5 id=using-messagepack>Using MessagePack</h5><p>Another popular option is <a href=https://msgpack.org/>MessagePack</a>, it offers implementations for most languages, giving us a certain level of compatibility if we were to implement a client in another language. We&rsquo;ll continue with our basic test here using the <a href=https://github.com/msgpack/msgpack-python>official python implementation</a>.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1>1
+</span><span class=lnt id=2>2
+</span><span class=lnt id=3>3
+</span><span class=lnt id=4>4
+</span><span class=lnt id=5>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=kn>import</span> <span class=nn>msgpack</span>
+
+<span class=n>data</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>dumps</span><span class=p>(</span><span class=n>TestObject</span><span class=p>(),</span> <span class=n>default</span><span class=o>=</span><span class=k>lambda</span> <span class=n>x</span><span class=p>:</span> <span class=n>x</span><span class=o>.</span><span class=vm>__dict__</span><span class=p>)</span>
+<span class=k>print</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=c1># b&#39;\x82\xaasomeString\xb0this is a string\xa7someInt{&#39;</span>
+<span class=k>print</span><span class=p>(</span><span class=nb>len</span><span class=p>(</span><span class=n>data</span><span class=p>))</span> <span class=c1># 38</span>
+</code></pre></td></tr></table></div></div><p>This option is already looking promising. We&rsquo;re at 38 bytes, our best result so far, but there are two issues that remain: the property names are still included and we can&rsquo;t restore this to a class instance. Fortunately, MessagePack is flexible enough for us to develop something custom that will fix those issues.</p><h4 id=improving-the-messagepack-serialization>Improving the MessagePack serialization</h4><p>The first thing we can to to improve the serialization payload is to remove the property names from the output. The way we can do this is by using a custom <code>Packer</code> and pack (serialize) values manually one by one without including the property names. We have to be careful to deserialize the values in the same order they were serialized in order to read the correct bytes. Here is an exploration of what that might look like, plus the code required to deserialize the payload too.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1> 1
+</span><span class=lnt id=2> 2
+</span><span class=lnt id=3> 3
+</span><span class=lnt id=4> 4
+</span><span class=lnt id=5> 5
+</span><span class=lnt id=6> 6
+</span><span class=lnt id=7> 7
+</span><span class=lnt id=8> 8
+</span><span class=lnt id=9> 9
+</span><span class=lnt id=10>10
+</span><span class=lnt id=11>11
+</span><span class=lnt id=12>12
+</span><span class=lnt id=13>13
+</span><span class=lnt id=14>14
+</span><span class=lnt id=15>15
+</span><span class=lnt id=16>16
+</span><span class=lnt id=17>17
+</span><span class=lnt id=18>18
+</span><span class=lnt id=19>19
+</span><span class=lnt id=20>20
+</span><span class=lnt id=21>21
+</span><span class=lnt id=22>22
+</span><span class=lnt id=23>23
+</span><span class=lnt id=24>24
+</span><span class=lnt id=25>25
+</span><span class=lnt id=26>26
+</span><span class=lnt id=27>27
+</span><span class=lnt id=28>28
+</span><span class=lnt id=29>29
+</span><span class=lnt id=30>30
+</span><span class=lnt id=31>31
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=kn>from</span> <span class=nn>io</span> <span class=kn>import</span> <span class=n>BytesIO</span>
+<span class=kn>import</span> <span class=nn>msgpack</span>
+
+<span class=k>class</span> <span class=nc>TestObject</span><span class=p>:</span>
+    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>someString</span> <span class=o>=</span> <span class=s2>&#34;this is a string&#34;</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>someInt</span> <span class=o>=</span> <span class=mi>123</span>
+
+    <span class=k>def</span> <span class=nf>serialize</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>bytes</span><span class=p>:</span>
+        <span class=c1># We don&#39;t want to reset the packer&#39;s buffer between calls to `pack()`</span>
+        <span class=c1># `autoreset=false` does that and allow us to retrieve the buffer with `bytes()`</span>
+        <span class=n>packer</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Packer</span><span class=p>(</span><span class=n>autoreset</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+        <span class=n>packer</span><span class=o>.</span><span class=n>pack</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>someString</span><span class=p>)</span>
+        <span class=n>packer</span><span class=o>.</span><span class=n>pack</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>someInt</span><span class=p>)</span>
+        <span class=k>return</span> <span class=n>packer</span><span class=o>.</span><span class=n>bytes</span><span class=p>()</span>
+
+    <span class=nd>@staticmethod</span>
+    <span class=k>def</span> <span class=nf>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=s1>&#39;TestObject&#39;</span><span class=p>:</span>
+        <span class=k>with</span> <span class=n>BytesIO</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=k>as</span> <span class=nb>buffer</span><span class=p>:</span>
+            <span class=n>unpacker</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Unpacker</span><span class=p>(</span><span class=nb>buffer</span><span class=p>,</span> <span class=n>raw</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+            <span class=n>instance</span> <span class=o>=</span> <span class=n>TestObject</span><span class=p>()</span>
+            <span class=n>instance</span><span class=o>.</span><span class=n>someString</span> <span class=o>=</span> <span class=n>unpacker</span><span class=o>.</span><span class=n>unpack</span><span class=p>()</span>
+            <span class=n>instance</span><span class=o>.</span><span class=n>someInt</span> <span class=o>=</span> <span class=n>unpacker</span><span class=o>.</span><span class=n>unpack</span><span class=p>()</span>
+            <span class=k>return</span> <span class=n>instance</span>
+
+<span class=n>data</span> <span class=o>=</span> <span class=n>TestObject</span><span class=p>()</span><span class=o>.</span><span class=n>serialize</span><span class=p>()</span>
+<span class=k>print</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=c1># b&#39;\xb0this is a string{&#39;</span>
+<span class=k>print</span><span class=p>(</span><span class=nb>len</span><span class=p>(</span><span class=n>data</span><span class=p>))</span> <span class=c1># 18</span>
+
+<span class=n>restored</span> <span class=o>=</span> <span class=n>TestObject</span><span class=o>.</span><span class=n>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>)</span>
+<span class=k>print</span><span class=p>(</span><span class=nb>isinstance</span><span class=p>(</span><span class=n>restored</span><span class=p>,</span> <span class=n>TestObject</span><span class=p>))</span> <span class=c1># True</span>
+</code></pre></td></tr></table></div></div><p>Space wise this is a huge improvement over the previous solutions we&rsquo;ve tried. We still haven&rsquo;t found a way to automatically deserialize into an instance of the class, we have to know the class in advance in order to call <code>deserialize</code> on it. Something that is instantly apparent, though, is that this is already starting to become a lot of work to serialize only two values. Even if we were to move the repeating code into a base class, we would still need to pack and unpack each property manually in every serializable class we would implement.</p><p>One of our goals is still to make this library easy to use with as little overhead as possible. The ideal usage scenario here would be for a user to simply list the properties they want serialized and the rest being handled automatically. Ideally we would like our class to look like this and still produce the same results:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1>1
+</span><span class=lnt id=2>2
+</span><span class=lnt id=3>3
+</span><span class=lnt id=4>4
+</span><span class=lnt id=5>5
+</span><span class=lnt id=6>6
+</span><span class=lnt id=7>7
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=k>class</span> <span class=nc>TestObject</span><span class=p>(</span><span class=n>Serializable</span><span class=p>):</span>
+    <span class=n>fields</span> <span class=o>=</span> <span class=p>[</span><span class=s2>&#34;someString&#34;</span><span class=p>,</span> <span class=s2>&#34;someInt&#34;</span><span class=p>]</span>
+
+    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=nb>super</span><span class=p>()</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>someString</span> <span class=o>=</span> <span class=s2>&#34;this is a string&#34;</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>someInt</span> <span class=o>=</span> <span class=mi>123</span>
+</code></pre></td></tr></table></div></div><p>An initial implementation of this <code>Serializable</code> class might look like the following:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1> 1
+</span><span class=lnt id=2> 2
+</span><span class=lnt id=3> 3
+</span><span class=lnt id=4> 4
+</span><span class=lnt id=5> 5
+</span><span class=lnt id=6> 6
+</span><span class=lnt id=7> 7
+</span><span class=lnt id=8> 8
+</span><span class=lnt id=9> 9
+</span><span class=lnt id=10>10
+</span><span class=lnt id=11>11
+</span><span class=lnt id=12>12
+</span><span class=lnt id=13>13
+</span><span class=lnt id=14>14
+</span><span class=lnt id=15>15
+</span><span class=lnt id=16>16
+</span><span class=lnt id=17>17
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=k>class</span> <span class=nc>Serializable</span><span class=p>:</span>
+    <span class=n>fields</span><span class=p>:</span> <span class=n>ClassVar</span><span class=p>[</span><span class=n>List</span><span class=p>[</span><span class=nb>str</span><span class=p>]]</span> <span class=o>=</span> <span class=p>[]</span>
+
+    <span class=nd>@classmethod</span>
+    <span class=k>def</span> <span class=nf>deserialize</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=s1>&#39;Serializable&#39;</span><span class=p>:</span>
+        <span class=k>with</span> <span class=n>BytesIO</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=k>as</span> <span class=nb>buffer</span><span class=p>:</span>
+            <span class=n>unpacker</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Unpacker</span><span class=p>(</span><span class=nb>buffer</span><span class=p>,</span> <span class=n>raw</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+            <span class=n>instance</span> <span class=o>=</span> <span class=bp>cls</span><span class=p>()</span>
+            <span class=k>for</span> <span class=n>field</span> <span class=ow>in</span> <span class=n>instance</span><span class=o>.</span><span class=n>fields</span><span class=p>:</span>
+                <span class=nb>setattr</span><span class=p>(</span><span class=n>instance</span><span class=p>,</span> <span class=n>field</span><span class=p>,</span> <span class=n>unpacker</span><span class=o>.</span><span class=n>unpack</span><span class=p>())</span>
+            <span class=k>return</span> <span class=n>instance</span>
+
+    <span class=k>def</span> <span class=nf>serialize</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>bytes</span><span class=p>:</span>
+        <span class=n>packer</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Packer</span><span class=p>(</span><span class=n>autoreset</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+        <span class=k>for</span> <span class=n>field</span> <span class=ow>in</span> <span class=bp>self</span><span class=o>.</span><span class=n>fields</span><span class=p>:</span>
+            <span class=n>packer</span><span class=o>.</span><span class=n>pack</span><span class=p>(</span><span class=nb>getattr</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>field</span><span class=p>))</span>
+        <span class=k>return</span> <span class=n>packer</span><span class=o>.</span><span class=n>bytes</span><span class=p>()</span>
+</code></pre></td></tr></table></div></div><p>From this point, we can look at how to improve this early prototype of a serializable class and progressively transform it into something more flexible. For starters, this won&rsquo;t let us extend from a serializable class and add fields to it because <code>fields</code> ends up being overwritten by the new subclass. In order to do this we need to be able to traverse the class hierarchy and accumulate fields that are defined at each level. For this we&rsquo;ll use this mouthful in the <code>Serializable</code> constructor:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1>1
+</span><span class=lnt id=2>2
+</span><span class=lnt id=3>3
+</span><span class=lnt id=4>4
+</span><span class=lnt id=5>5
+</span><span class=lnt id=6>6
+</span><span class=lnt id=7>7
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=k>def</span> <span class=nf>__init_subclass__</span><span class=p>(</span><span class=bp>cls</span><span class=p>):</span>
+    <span class=bp>cls</span><span class=o>.</span><span class=n>_fields</span> <span class=o>=</span> <span class=nb>list</span><span class=p>(</span><span class=n>OrderedDict</span><span class=o>.</span><span class=n>fromkeys</span><span class=p>([</span>
+        <span class=n>field</span> <span class=k>for</span> <span class=n>fields</span> <span class=ow>in</span> <span class=p>[</span>
+            <span class=n>c</span><span class=o>.</span><span class=n>fields</span> <span class=k>for</span> <span class=n>c</span> <span class=ow>in</span> <span class=nb>reversed</span><span class=p>(</span><span class=bp>cls</span><span class=o>.</span><span class=vm>__mro__</span><span class=p>)</span> \
+                <span class=k>if</span> <span class=nb>hasattr</span><span class=p>(</span><span class=n>c</span><span class=p>,</span> <span class=s1>&#39;fields&#39;</span><span class=p>)</span> <span class=ow>and</span> <span class=n>c</span><span class=o>.</span><span class=n>fields</span> <span class=ow>is</span> <span class=ow>not</span> <span class=bp>None</span>
+        <span class=p>]</span> <span class=k>for</span> <span class=n>field</span> <span class=ow>in</span> <span class=n>fields</span>
+    <span class=p>]))</span>
+</code></pre></td></tr></table></div></div><p>First of all, it uses <a href=https://docs.python.org/3/reference/datamodel.html#object.__init_subclass__><code>__init_subclass__</code></a> which is a method called whenever the containing class is subclassed. This allows us to initialize the list of serializable fields only once per subclass and store the results to a class variable. It leverages the class <a href="https://docs.python.org/3/library/stdtypes.html?highlight=mro#class.__mro__">MRO</a> (Method Resolution Order) to traverse the class hierarchy in the same fashion Python would to resolve methods. Then, fields are accumulated, deduplicated and saved to be reused by the <code>serialize</code> and <code>deserialize</code> methods.</p><p>Now that we have an easy way to define the serializable fields, the next thing to improve would be to add support for automatic restoration of serialized data into its original class. For this we&rsquo;ll need to create a registry to store associations between some identifier and the classes. A natural choice for the identifier would be the class name, it would even be easy to add this to <code>__init_subclass__</code> to automate the registration. But we need to remember our goal of having the smallest payload possible. A class name would use valuable space when transmitting serialized class instances over the network. Besides, if we keep in mind the context of the collaborative editing framework, we might want to interoperate with systems that might not be built in Python therefore might not have a direct equivalent to the class names. For that, we&rsquo;ll simply use a single byte to identify classes, we can always add a second byte later to group serializable classes by categories (more on that later, but something along the lines of grouping commands, requests, notifications, etc. under a prefix).</p><p>Modifying our class gives us this:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1> 1
+</span><span class=lnt id=2> 2
+</span><span class=lnt id=3> 3
+</span><span class=lnt id=4> 4
+</span><span class=lnt id=5> 5
+</span><span class=lnt id=6> 6
+</span><span class=lnt id=7> 7
+</span><span class=lnt id=8> 8
+</span><span class=lnt id=9> 9
+</span><span class=lnt id=10>10
+</span><span class=lnt id=11>11
+</span><span class=lnt id=12>12
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=kn>from</span> <span class=nn>typing</span> <span class=kn>import</span> <span class=n>ClassVar</span><span class=p>,</span> <span class=n>Dict</span><span class=p>,</span> <span class=n>Type</span>
+
+<span class=k>class</span> <span class=nc>Serializable</span><span class=p>:</span>
+    <span class=n>_classes</span><span class=p>:</span> <span class=n>ClassVar</span><span class=p>[</span><span class=n>Dict</span><span class=p>[</span><span class=nb>int</span><span class=p>,</span> <span class=n>Type</span><span class=p>[</span><span class=s1>&#39;Serializable&#39;</span><span class=p>]]]</span> <span class=o>=</span> <span class=nb>dict</span><span class=p>()</span>
+
+    <span class=k>def</span> <span class=nf>__init_subclass__</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=nb>id</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+        <span class=k>if</span> <span class=nb>id</span> <span class=ow>in</span> <span class=n>Serializable</span><span class=o>.</span><span class=n>_classes</span><span class=p>:</span>
+            <span class=k>raise</span> <span class=ne>Exception</span><span class=p>(</span><span class=n>f</span><span class=s2>&#34;Class id </span><span class=se>\&#34;</span><span class=s2>{id}</span><span class=se>\&#34;</span><span class=s2> already used by </span><span class=se>\&#34;</span><span class=s2>{Serializable._classes[id].__name__}</span><span class=se>\&#34;</span><span class=s2>&#34;</span><span class=p>)</span>
+        <span class=n>Serializable</span><span class=o>.</span><span class=n>_classes</span><span class=p>[</span><span class=nb>id</span><span class=p>]</span> <span class=o>=</span> <span class=bp>cls</span>
+
+        <span class=bp>cls</span><span class=o>.</span><span class=n>_class_id</span> <span class=o>=</span> <span class=nb>id</span>
+        <span class=o>...</span><span class=n>snip</span><span class=o>...</span>
+</code></pre></td></tr></table></div></div><p>The <code>id</code> keyword argument added to <code>__init_subclass__</code> now makes it a requirement to pass an id when extending <code>Serializable</code>, like this:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1>1
+</span><span class=lnt id=2>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=k>class</span> <span class=nc>Sample</span><span class=p>(</span><span class=n>Serializable</span><span class=p>,</span> <span class=nb>id</span><span class=o>=</span><span class=mh>0x00</span><span class=p>)</span>
+    <span class=o>...</span>
+</code></pre></td></tr></table></div></div><p>It is good to remember that while this makes the registration of serializable classes automatic, they still need to be imported somewhere for this to work. It might sound obvious said like this, but it is entirely possible that a client or server make use of some properties or methods of a deserialized object without ever using the class directly. It&rsquo;s a good idea to import all serializable classes in a module and import that module when initializing the application.</p><p>With the class registry in place we can now start including the id in the payload and use it back when deserializing.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=hl><span class=lnt id=1> 1
+</span></span><span class=lnt id=2> 2
+</span><span class=lnt id=3> 3
+</span><span class=lnt id=4> 4
+</span><span class=lnt id=5> 5
+</span><span class=hl><span class=lnt id=6> 6
+</span></span><span class=hl><span class=lnt id=7> 7
+</span></span><span class=hl><span class=lnt id=8> 8
+</span></span><span class=hl><span class=lnt id=9> 9
+</span></span><span class=hl><span class=lnt id=10>10
+</span></span><span class=hl><span class=lnt id=11>11
+</span></span><span class=lnt id=12>12
+</span><span class=lnt id=13>13
+</span><span class=lnt id=14>14
+</span><span class=lnt id=15>15
+</span><span class=lnt id=16>16
+</span><span class=lnt id=17>17
+</span><span class=lnt id=18>18
+</span><span class=lnt id=19>19
+</span><span class=hl><span class=lnt id=20>20
+</span></span><span class=lnt id=21>21
+</span><span class=lnt id=22>22
+</span><span class=lnt id=23>23
+</span><span class=lnt id=24>24
+</span><span class=lnt id=25>25
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=hl><span class=nd>@staticmethod</span>
+</span><span class=k>def</span> <span class=nf>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=s1>&#39;Serializable&#39;</span><span class=p>]:</span>
+    <span class=k>with</span> <span class=n>BytesIO</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=k>as</span> <span class=nb>buffer</span><span class=p>:</span>
+        <span class=n>unpacker</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Unpacker</span><span class=p>(</span><span class=nb>buffer</span><span class=p>,</span> <span class=n>raw</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+
+<span class=hl>        <span class=n>class_id</span> <span class=o>=</span> <span class=n>unpacker</span><span class=o>.</span><span class=n>unpack</span><span class=p>()</span>
+</span><span class=hl>        <span class=bp>cls</span> <span class=o>=</span> <span class=n>Serializable</span><span class=o>.</span><span class=n>_classes</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>class_id</span><span class=p>)</span>
+</span><span class=hl>        <span class=k>if</span> <span class=ow>not</span> <span class=bp>cls</span><span class=p>:</span>
+</span><span class=hl>            <span class=k>return</span> <span class=bp>None</span>
+</span><span class=hl>
+</span><span class=hl>        <span class=n>instance</span> <span class=o>=</span> <span class=bp>cls</span><span class=p>()</span>
+</span>        <span class=k>for</span> <span class=n>field</span> <span class=ow>in</span> <span class=bp>cls</span><span class=o>.</span><span class=n>_fields</span><span class=p>:</span>
+            <span class=nb>setattr</span><span class=p>(</span><span class=n>instance</span><span class=p>,</span> <span class=n>field</span><span class=p>,</span> <span class=n>unpacker</span><span class=o>.</span><span class=n>unpack</span><span class=p>())</span>
+
+        <span class=k>return</span> <span class=n>instance</span>
+
+<span class=k>def</span> <span class=nf>serialize</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>bytes</span><span class=p>:</span>
+    <span class=n>packer</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Packer</span><span class=p>(</span><span class=n>autoreset</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+
+<span class=hl>    <span class=n>packer</span><span class=o>.</span><span class=n>pack</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>_class_id</span><span class=p>)</span>
+</span>
+    <span class=k>for</span> <span class=n>field</span> <span class=ow>in</span> <span class=bp>self</span><span class=o>.</span><span class=vm>__class__</span><span class=o>.</span><span class=n>_fields</span><span class=p>:</span>
+        <span class=n>packer</span><span class=o>.</span><span class=n>pack</span><span class=p>(</span><span class=nb>getattr</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>field</span><span class=p>))</span>
+
+    <span class=k>return</span> <span class=n>packer</span><span class=o>.</span><span class=n>bytes</span><span class=p>()</span>
+</code></pre></td></tr></table></div></div><p>Note here that besides the additional code, <code>@classmethod</code> was changed to <code>@staticmethod</code> since we don&rsquo;t require the class argument anymore to create a new instance, we get the class from the registry. WIth those simple changes it is now possible to deserialize data without knowing the class in advance:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1>1
+</span><span class=lnt id=2>2
+</span><span class=lnt id=3>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=n>data</span> <span class=o>=</span> <span class=n>Sample</span><span class=p>()</span><span class=o>.</span><span class=n>serialize</span><span class=p>()</span>
+<span class=n>restored</span> <span class=o>=</span> <span class=n>Serializable</span><span class=o>.</span><span class=n>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>)</span>
+<span class=k>print</span><span class=p>(</span><span class=nb>isinstance</span><span class=p>(</span><span class=n>restored</span><span class=p>,</span> <span class=n>Sample</span><span class=p>))</span> <span class=c1># True</span>
+</code></pre></td></tr></table></div></div><h5 id=reworking-the-constructor>Reworking the constructor</h5><p>Something that might not seem evident in the simplified examples so far is that our deserialization method messes up with our habits with the constructor. Because the class is instantiated first and then values are set from the payload, we can&rsquo;t initialize the instance using those values.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1> 1
+</span><span class=lnt id=2> 2
+</span><span class=lnt id=3> 3
+</span><span class=lnt id=4> 4
+</span><span class=lnt id=5> 5
+</span><span class=lnt id=6> 6
+</span><span class=lnt id=7> 7
+</span><span class=lnt id=8> 8
+</span><span class=lnt id=9> 9
+</span><span class=lnt id=10>10
+</span><span class=lnt id=11>11
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=k>class</span> <span class=nc>Sample</span><span class=p>(</span><span class=n>Serializable</span><span class=p>,</span> <span class=nb>id</span><span class=o>=</span><span class=mh>0x00</span><span class=p>):</span>
+    <span class=n>fields</span> <span class=o>=</span> <span class=p>[</span><span class=s2>&#34;foo&#34;</span><span class=p>]</span>
+
+    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>foo</span><span class=p>:</span><span class=nb>str</span> <span class=o>=</span> <span class=bp>None</span><span class=p>):</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>foo</span> <span class=o>=</span> <span class=n>foo</span>
+        <span class=k>print</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>foo</span><span class=p>)</span> <span class=c1># placeholder for anything depending on `self.foo` being set</span>
+
+<span class=n>sample</span> <span class=o>=</span> <span class=n>Sample</span><span class=p>(</span><span class=s2>&#34;Hello World!&#34;</span><span class=p>)</span> <span class=c1># &#34;Hello World!&#34;</span>
+<span class=n>data</span> <span class=o>=</span> <span class=n>sample</span><span class=o>.</span><span class=n>serialize</span><span class=p>()</span>
+<span class=n>restored</span> <span class=o>=</span> <span class=n>Serializable</span><span class=o>.</span><span class=n>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=c1># None</span>
+<span class=k>print</span><span class=p>(</span><span class=n>restored</span><span class=o>.</span><span class=n>foo</span><span class=p>)</span> <span class=c1># &#34;Hello World!&#34;</span>
+</code></pre></td></tr></table></div></div><p>Here another side effect of how we construct the class instance is that we <em>have</em> to make all arguments optional since the deserializer doesn&rsquo;t pass anything to the constructor. We could come up with a way to pass all the values to the constructor but we couldn&rsquo;t possibly know, in the deserializer, what arguments to pass. Besides, we don&rsquo;t want to prevent developers from using the classes normally in order to work with the serializer.</p><p>Fortunately, Python is full of useful tricks that we can use to accomplish what we want with minimal impact to the end user. We keep all the complexity encapsulated in the <code>Serializable</code> class and expose the least amount of it possible. In Python we can create an instance of a class by calling <a href=https://docs.python.org/3/reference/datamodel.html#object.__new__>__new__</a> on the class. It will create an instance but will not call <code>__init__</code> on the new instance.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1> 1
+</span><span class=lnt id=2> 2
+</span><span class=lnt id=3> 3
+</span><span class=lnt id=4> 4
+</span><span class=lnt id=5> 5
+</span><span class=lnt id=6> 6
+</span><span class=lnt id=7> 7
+</span><span class=lnt id=8> 8
+</span><span class=lnt id=9> 9
+</span><span class=lnt id=10>10
+</span><span class=hl><span class=lnt id=11>11
+</span></span><span class=lnt id=12>12
+</span><span class=lnt id=13>13
+</span><span class=lnt id=14>14
+</span><span class=lnt id=15>15
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=nd>@staticmethod</span>
+<span class=k>def</span> <span class=nf>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=s1>&#39;Serializable&#39;</span><span class=p>]:</span>
+    <span class=k>with</span> <span class=n>BytesIO</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=k>as</span> <span class=nb>buffer</span><span class=p>:</span>
+        <span class=n>unpacker</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Unpacker</span><span class=p>(</span><span class=nb>buffer</span><span class=p>,</span> <span class=n>raw</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+
+        <span class=n>class_id</span> <span class=o>=</span> <span class=n>unpacker</span><span class=o>.</span><span class=n>unpack</span><span class=p>()</span>
+        <span class=bp>cls</span> <span class=o>=</span> <span class=n>Serializable</span><span class=o>.</span><span class=n>_classes</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>class_id</span><span class=p>)</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=bp>cls</span><span class=p>:</span>
+            <span class=k>return</span> <span class=bp>None</span>
+
+<span class=hl>        <span class=n>instance</span> <span class=o>=</span> <span class=bp>cls</span><span class=o>.</span><span class=fm>__new__</span><span class=p>(</span><span class=bp>cls</span><span class=p>)</span>
+</span>        <span class=k>for</span> <span class=n>field</span> <span class=ow>in</span> <span class=bp>cls</span><span class=o>.</span><span class=n>_fields</span><span class=p>:</span>
+            <span class=nb>setattr</span><span class=p>(</span><span class=n>instance</span><span class=p>,</span> <span class=n>field</span><span class=p>,</span> <span class=n>unpacker</span><span class=o>.</span><span class=n>unpack</span><span class=p>())</span>
+
+        <span class=k>return</span> <span class=n>instance</span>
+</code></pre></td></tr></table></div></div><p>That only gets us a third of the way there though. Because, now, anything that we were relying on from the constructor doesn&rsquo;t get called at all. We can introduce a new convention for this, we can decide that <code>__init__</code> is only for setting instance variables from manually constructed classes and introduce an <code>initialize()</code> method that can be used to implement initialization logic that depends on those values. The deserializer can call that method once everything is set.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1> 1
+</span><span class=lnt id=2> 2
+</span><span class=lnt id=3> 3
+</span><span class=lnt id=4> 4
+</span><span class=lnt id=5> 5
+</span><span class=lnt id=6> 6
+</span><span class=lnt id=7> 7
+</span><span class=lnt id=8> 8
+</span><span class=lnt id=9> 9
+</span><span class=lnt id=10>10
+</span><span class=lnt id=11>11
+</span><span class=lnt id=12>12
+</span><span class=lnt id=13>13
+</span><span class=lnt id=14>14
+</span><span class=hl><span class=lnt id=15>15
+</span></span><span class=lnt id=16>16
+</span><span class=lnt id=17>17
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=nd>@staticmethod</span>
+<span class=k>def</span> <span class=nf>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=s1>&#39;Serializable&#39;</span><span class=p>]:</span>
+    <span class=k>with</span> <span class=n>BytesIO</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=k>as</span> <span class=nb>buffer</span><span class=p>:</span>
+        <span class=n>unpacker</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Unpacker</span><span class=p>(</span><span class=nb>buffer</span><span class=p>,</span> <span class=n>raw</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+
+        <span class=n>class_id</span> <span class=o>=</span> <span class=n>unpacker</span><span class=o>.</span><span class=n>unpack</span><span class=p>()</span>
+        <span class=bp>cls</span> <span class=o>=</span> <span class=n>Serializable</span><span class=o>.</span><span class=n>_classes</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>class_id</span><span class=p>)</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=bp>cls</span><span class=p>:</span>
+            <span class=k>return</span> <span class=bp>None</span>
+
+        <span class=n>instance</span> <span class=o>=</span> <span class=bp>cls</span><span class=o>.</span><span class=fm>__new__</span><span class=p>(</span><span class=bp>cls</span><span class=p>)</span>
+        <span class=k>for</span> <span class=n>field</span> <span class=ow>in</span> <span class=bp>cls</span><span class=o>.</span><span class=n>_fields</span><span class=p>:</span>
+            <span class=nb>setattr</span><span class=p>(</span><span class=n>instance</span><span class=p>,</span> <span class=n>field</span><span class=p>,</span> <span class=n>unpacker</span><span class=o>.</span><span class=n>unpack</span><span class=p>())</span>
+
+<span class=hl>        <span class=n>instance</span><span class=o>.</span><span class=n>initialize</span><span class=p>()</span>
+</span>
+        <span class=k>return</span> <span class=n>instance</span>
+</code></pre></td></tr></table></div></div><p>We&rsquo;re now two thirds of the way there. We fixed the deserialization, but creating an instance manually won&rsquo;t call the new <code>initialize()</code> method. Again, it shouldn&rsquo;t be the end user&rsquo;s responsibility to call this manually.</p><p>As always, there&rsquo;s a way to make this possible, and now it involves using <a href=https://docs.python.org/3/reference/datamodel.html#metaclasses>metaclasses</a>. Metaclasses are to classes what classes are to instances, if that makes sense. If a class has a metaclass, it will be used to &ldquo;construct&rdquo; the class. We can implement a simple metaclass that leverages <a href=https://docs.python.org/3/reference/datamodel.html#emulating-callable-objects><code>__call__</code></a> to &ldquo;intercept&rdquo; instance creation calls and add our own logic to it that will call <code>initialize()</code> automatically for us.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=hl><span class=lnt id=1> 1
+</span></span><span class=hl><span class=lnt id=2> 2
+</span></span><span class=hl><span class=lnt id=3> 3
+</span></span><span class=hl><span class=lnt id=4> 4
+</span></span><span class=hl><span class=lnt id=5> 5
+</span></span><span class=lnt id=6> 6
+</span><span class=lnt id=7> 7
+</span><span class=hl><span class=lnt id=8> 8
+</span></span><span class=lnt id=9> 9
+</span><span class=lnt id=10>10
+</span><span class=hl><span class=lnt id=11>11
+</span></span><span class=hl><span class=lnt id=12>12
+</span></span><span class=hl><span class=lnt id=13>13
+</span></span><span class=lnt id=14>14
+</span><span class=lnt id=15>15
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=hl><span class=k>class</span> <span class=nc>SerializableMeta</span><span class=p>(</span><span class=nb>type</span><span class=p>):</span>
+</span><span class=hl>    <span class=k>def</span> <span class=fm>__call__</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=o>*</span><span class=n>args</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>):</span>
+</span><span class=hl>        <span class=n>obj</span> <span class=o>=</span> <span class=nb>type</span><span class=o>.</span><span class=fm>__call__</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=o>*</span><span class=n>args</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>)</span>
+</span><span class=hl>        <span class=n>obj</span><span class=o>.</span><span class=n>initialize</span><span class=p>()</span>
+</span><span class=hl>        <span class=k>return</span> <span class=n>obj</span>
+</span>
+
+<span class=hl><span class=k>class</span> <span class=nc>Serializable</span><span class=p>(</span><span class=n>metaclass</span><span class=o>=</span><span class=n>SerializableMeta</span><span class=p>):</span>
+</span>    <span class=o>...</span>
+
+<span class=hl>    <span class=k>def</span> <span class=nf>initialize</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span><span class=hl>        <span class=s2>&#34;&#34;&#34;Placeholder, should be overridden if necessary&#34;&#34;&#34;</span>
+</span><span class=hl>        <span class=k>pass</span>
+</span>
+    <span class=o>...</span>
+</code></pre></td></tr></table></div></div><h5 id=adding-custom-serializers>Adding custom serializers</h5><p>There&rsquo;s yet another detail we&rsquo;re missing. As-is, we can serialize pretty much anything but not other class instances. If we want to serialize other classes, they will first need to be serializable themselves and we&rsquo;ll need to register custom serializers and use them with <code>msgpack</code>.</p><p>To accomplish that we can use what <code>msgpack</code> call extended types. At serialization, when creating the <code>Packer</code> instance, we can pass a <code>default</code> argument to the constructor. This function will be called with a value when <code>msgpack</code> can&rsquo;t serialize it. It gives us the change to decide how to serialize the data and return <code>bytes</code> identified by an <code>int</code> code, wrapped in an <code>ExtType</code>.</p><p>But before that, let&rsquo;s add a way to register custom serializers. We don&rsquo;t want to bloat the serialization method with a bunch of different ways to serialize data. We can&rsquo;t predict <em>all</em> the possible data type a user might want to serialize so it&rsquo;s better to allow them to implement their own and register them.</p><p>Here&rsquo;s the base class to extend to create a custom serializer:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1> 1
+</span><span class=lnt id=2> 2
+</span><span class=lnt id=3> 3
+</span><span class=lnt id=4> 4
+</span><span class=lnt id=5> 5
+</span><span class=lnt id=6> 6
+</span><span class=lnt id=7> 7
+</span><span class=lnt id=8> 8
+</span><span class=lnt id=9> 9
+</span><span class=lnt id=10>10
+</span><span class=lnt id=11>11
+</span><span class=lnt id=12>12
+</span><span class=lnt id=13>13
+</span><span class=lnt id=14>14
+</span><span class=lnt id=15>15
+</span><span class=lnt id=16>16
+</span><span class=lnt id=17>17
+</span><span class=lnt id=18>18
+</span><span class=lnt id=19>19
+</span><span class=lnt id=20>20
+</span><span class=lnt id=21>21
+</span><span class=lnt id=22>22
+</span><span class=lnt id=23>23
+</span><span class=lnt id=24>24
+</span><span class=lnt id=25>25
+</span><span class=lnt id=26>26
+</span><span class=lnt id=27>27
+</span><span class=lnt id=28>28
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=kn>from</span> <span class=nn>abc</span> <span class=kn>import</span> <span class=n>ABCMeta</span><span class=p>,</span> <span class=n>abstractmethod</span>
+<span class=kn>from</span> <span class=nn>typing</span> <span class=kn>import</span> <span class=n>Generic</span><span class=p>,</span> <span class=n>TypeVar</span><span class=p>,</span> <span class=n>Optional</span><span class=p>,</span> <span class=n>Any</span>
+
+
+<span class=n>T</span> <span class=o>=</span> <span class=n>TypeVar</span><span class=p>(</span><span class=s1>&#39;T&#39;</span><span class=p>)</span>
+
+
+<span class=k>class</span> <span class=nc>CustomSerializer</span><span class=p>(</span><span class=n>Generic</span><span class=p>[</span><span class=n>T</span><span class=p>],</span> <span class=n>metaclass</span><span class=o>=</span><span class=n>ABCMeta</span><span class=p>):</span>
+
+    <span class=k>def</span> <span class=nf>__init_subclass__</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>code</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+        <span class=n>Serializable</span><span class=o>.</span><span class=n>add_custom_serializer</span><span class=p>(</span><span class=n>code</span><span class=o>=</span><span class=n>code</span><span class=p>,</span> <span class=n>serializer</span><span class=o>=</span><span class=bp>cls</span><span class=p>())</span>
+
+    <span class=nd>@abstractmethod</span>
+    <span class=k>def</span> <span class=nf>serialize</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>obj</span><span class=p>:</span> <span class=n>T</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=nb>bytes</span><span class=p>]:</span>
+        <span class=s2>&#34;&#34;&#34;
+</span><span class=s2>        This method should return a bytes representation of obj
+</span><span class=s2>        if it is able to serialize it and None if it doesn&#39;t
+</span><span class=s2>        support the serialization of obj.
+</span><span class=s2>        &#34;&#34;&#34;</span>
+        <span class=k>pass</span>
+
+    <span class=nd>@abstractmethod</span>
+    <span class=k>def</span> <span class=nf>deserialize</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=n>T</span><span class=p>]:</span>
+        <span class=s2>&#34;&#34;&#34;
+</span><span class=s2>        This method should return an instance of T from
+</span><span class=s2>        the bytes in data or None if there was an error.
+</span><span class=s2>        &#34;&#34;&#34;</span>
+        <span class=k>pass</span>
+</code></pre></td></tr></table></div></div><p>And this is our custom serializer allowing <code>msgpack</code> to work with <code>Serializable</code> classes:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1>1
+</span><span class=lnt id=2>2
+</span><span class=lnt id=3>3
+</span><span class=lnt id=4>4
+</span><span class=lnt id=5>5
+</span><span class=lnt id=6>6
+</span><span class=lnt id=7>7
+</span><span class=lnt id=8>8
+</span><span class=lnt id=9>9
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=k>class</span> <span class=nc>SerializableSerializer</span><span class=p>(</span><span class=n>CustomSerializer</span><span class=p>[</span><span class=n>Serializable</span><span class=p>],</span> <span class=n>code</span><span class=o>=</span><span class=mh>0x00</span><span class=p>):</span>
+
+    <span class=k>def</span> <span class=nf>serialize</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>obj</span><span class=p>:</span> <span class=n>Serializable</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=nb>bytes</span><span class=p>]:</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>obj</span><span class=p>,</span> <span class=n>Serializable</span><span class=p>):</span>
+            <span class=k>return</span> <span class=bp>None</span>
+        <span class=k>return</span> <span class=n>obj</span><span class=o>.</span><span class=n>serialize</span><span class=p>()</span>
+
+    <span class=k>def</span> <span class=nf>deserialize</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=n>Serializable</span><span class=p>]:</span>
+        <span class=k>return</span> <span class=n>Serializable</span><span class=o>.</span><span class=n>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>)</span>
+</code></pre></td></tr></table></div></div><p>Just like with serializable classe, it is important to reference custom serializers somewhere by importing them in order to have them auto-register.</p><p>Before getting into how to use the custom serializers we&rsquo;ll first add the<code>add_custom_serializer</code> method to the <code>Serializable</code> class.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1> 1
+</span><span class=lnt id=2> 2
+</span><span class=lnt id=3> 3
+</span><span class=lnt id=4> 4
+</span><span class=lnt id=5> 5
+</span><span class=lnt id=6> 6
+</span><span class=lnt id=7> 7
+</span><span class=lnt id=8> 8
+</span><span class=lnt id=9> 9
+</span><span class=lnt id=10>10
+</span><span class=lnt id=11>11
+</span><span class=lnt id=12>12
+</span><span class=lnt id=13>13
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=k>class</span> <span class=nc>Serializable</span><span class=p>(</span><span class=n>metaclass</span><span class=o>=</span><span class=n>SerializableMeta</span><span class=p>):</span>
+
+    <span class=o>...</span><span class=n>snip</span><span class=o>...</span>
+
+    <span class=n>_serializers</span><span class=p>:</span> <span class=n>ClassVar</span><span class=p>[</span><span class=n>Dict</span><span class=p>[</span><span class=nb>int</span><span class=p>,</span> <span class=n>CustomSerializer</span><span class=p>]]</span> <span class=o>=</span> <span class=nb>dict</span><span class=p>()</span>
+
+    <span class=nd>@classmethod</span>
+    <span class=k>def</span> <span class=nf>add_custom_serializer</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>code</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span> <span class=n>serializer</span><span class=p>:</span> <span class=n>CustomSerializer</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=bp>None</span><span class=p>:</span>
+        <span class=k>if</span> <span class=n>code</span> <span class=ow>in</span> <span class=bp>cls</span><span class=o>.</span><span class=n>_serializers</span><span class=p>:</span>
+            <span class=k>raise</span> <span class=ne>Exception</span><span class=p>(</span><span class=n>f</span><span class=s2>&#34;Serializer code {code} already in use&#34;</span><span class=p>)</span>
+        <span class=bp>cls</span><span class=o>.</span><span class=n>_serializers</span><span class=p>[</span><span class=n>code</span><span class=p>]</span> <span class=o>=</span> <span class=n>serializer</span>
+
+    <span class=o>...</span><span class=n>snip</span><span class=o>...</span>
+</code></pre></td></tr></table></div></div><p>These are the modifications to the <code>serialize</code> method. From here we can see how the <code>default</code> function works. Since we can&rsquo;t know what the criteria for a custom serializer might be, we loop over each one registered and call it. If it returns a value, we use it, and if it returns <code>None</code> then we skip and try the next one. It&rsquo;s setup to raise an exception if a value that is expected to be serialized doesn&rsquo;t have a custom serializer. It allow catching mistakes while developing rather than learn later that some value was never serialized.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1> 1
+</span><span class=hl><span class=lnt id=2> 2
+</span></span><span class=hl><span class=lnt id=3> 3
+</span></span><span class=hl><span class=lnt id=4> 4
+</span></span><span class=hl><span class=lnt id=5> 5
+</span></span><span class=hl><span class=lnt id=6> 6
+</span></span><span class=hl><span class=lnt id=7> 7
+</span></span><span class=hl><span class=lnt id=8> 8
+</span></span><span class=hl><span class=lnt id=9> 9
+</span></span><span class=lnt id=10>10
+</span><span class=lnt id=11>11
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=k>def</span> <span class=nf>serialize</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>bytes</span><span class=p>:</span>
+<span class=hl>    <span class=k>def</span> <span class=nf>default</span><span class=p>(</span><span class=n>obj</span><span class=p>:</span> <span class=n>Any</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>ExtType</span><span class=p>:</span>
+</span><span class=hl>        <span class=k>for</span> <span class=n>code</span><span class=p>,</span> <span class=n>serializer</span> <span class=ow>in</span> <span class=bp>self</span><span class=o>.</span><span class=n>_serializers</span><span class=o>.</span><span class=n>items</span><span class=p>():</span>
+</span><span class=hl>            <span class=n>data</span> <span class=o>=</span> <span class=n>serializer</span><span class=o>.</span><span class=n>serialize</span><span class=p>(</span><span class=n>obj</span><span class=p>)</span>
+</span><span class=hl>            <span class=k>if</span> <span class=n>data</span><span class=p>:</span>
+</span><span class=hl>                <span class=k>return</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>ExtType</span><span class=p>(</span><span class=n>code</span><span class=p>,</span> <span class=n>data</span><span class=p>)</span>
+</span><span class=hl>        <span class=k>raise</span> <span class=ne>TypeError</span><span class=p>(</span><span class=n>f</span><span class=s2>&#34;Unknown type encountered: {obj}&#34;</span><span class=p>)</span>
+</span><span class=hl>
+</span><span class=hl>    <span class=n>packer</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Packer</span><span class=p>(</span><span class=n>default</span><span class=o>=</span><span class=n>default</span><span class=p>,</span> <span class=n>autoreset</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+</span>
+    <span class=o>...</span><span class=n>snip</span><span class=o>...</span>
+</code></pre></td></tr></table></div></div><p>The <code>deserialize</code> method now looks like this, with the added <code>ext_hook</code> method:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=hl><span class=lnt id=1> 1
+</span></span><span class=hl><span class=lnt id=2> 2
+</span></span><span class=hl><span class=lnt id=3> 3
+</span></span><span class=hl><span class=lnt id=4> 4
+</span></span><span class=hl><span class=lnt id=5> 5
+</span></span><span class=lnt id=6> 6
+</span><span class=hl><span class=lnt id=7> 7
+</span></span><span class=lnt id=8> 8
+</span><span class=lnt id=9> 9
+</span><span class=hl><span class=lnt id=10>10
+</span></span><span class=hl><span class=lnt id=11>11
+</span></span><span class=lnt id=12>12
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=hl><span class=nd>@classmethod</span>
+</span><span class=hl><span class=k>def</span> <span class=nf>ext_hook</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>code</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span> <span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Any</span><span class=p>:</span>
+</span><span class=hl>    <span class=n>serializer</span> <span class=o>=</span> <span class=bp>cls</span><span class=o>.</span><span class=n>_serializers</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>code</span><span class=p>)</span>
+</span><span class=hl>    <span class=k>if</span> <span class=n>serializer</span><span class=p>:</span>
+</span><span class=hl>        <span class=k>return</span> <span class=n>serializer</span><span class=o>.</span><span class=n>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>)</span>
+</span>
+<span class=hl><span class=nd>@classmethod</span>
+</span><span class=k>def</span> <span class=nf>deserialize</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=s1>&#39;Serializable&#39;</span><span class=p>]:</span>
+    <span class=k>with</span> <span class=n>BytesIO</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=k>as</span> <span class=nb>buffer</span><span class=p>:</span>
+<span class=hl>        <span class=n>unpacker</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Unpacker</span><span class=p>(</span>
+</span><span class=hl>            <span class=nb>buffer</span><span class=p>,</span> <span class=n>ext_hook</span><span class=o>=</span><span class=bp>cls</span><span class=o>.</span><span class=n>ext_hook</span><span class=p>,</span> <span class=n>raw</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+</span>    <span class=o>...</span><span class=n>snip</span><span class=o>...</span>
+</code></pre></td></tr></table></div></div><h2 id=known-issues>Known Issues</h2><h3 id=versioning>Versioning</h3><p>Meh</p><h3 id=recursive-object>Recursive object</h3><p>JUST DON&rsquo;T DO IT</p><h3 id=complete-class>Complete Class</h3><aside class=collapsable><input id=toggle-c2VyaWFsaXphYmxlLnB5 type=checkbox>
+<label for=toggle-c2VyaWFsaXphYmxlLnB5><div class=title><i class="far fa-file-alt"></i>&nbsp;Expand <code>serializable.py</code> source.</div><div class=download><a href=https://ubald.dev/articles/network-collaboration/serialization/serializable.py><i class="fas fa-file-download"></i>&nbsp;Download</a></div></label><div class=content><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt id=1>  1
+</span><span class=lnt id=2>  2
+</span><span class=lnt id=3>  3
+</span><span class=lnt id=4>  4
+</span><span class=lnt id=5>  5
+</span><span class=lnt id=6>  6
+</span><span class=lnt id=7>  7
+</span><span class=lnt id=8>  8
+</span><span class=lnt id=9>  9
+</span><span class=lnt id=10> 10
+</span><span class=lnt id=11> 11
+</span><span class=lnt id=12> 12
+</span><span class=lnt id=13> 13
+</span><span class=lnt id=14> 14
+</span><span class=lnt id=15> 15
+</span><span class=lnt id=16> 16
+</span><span class=lnt id=17> 17
+</span><span class=lnt id=18> 18
+</span><span class=lnt id=19> 19
+</span><span class=lnt id=20> 20
+</span><span class=lnt id=21> 21
+</span><span class=lnt id=22> 22
+</span><span class=lnt id=23> 23
+</span><span class=lnt id=24> 24
+</span><span class=lnt id=25> 25
+</span><span class=lnt id=26> 26
+</span><span class=lnt id=27> 27
+</span><span class=lnt id=28> 28
+</span><span class=lnt id=29> 29
+</span><span class=lnt id=30> 30
+</span><span class=lnt id=31> 31
+</span><span class=lnt id=32> 32
+</span><span class=lnt id=33> 33
+</span><span class=lnt id=34> 34
+</span><span class=lnt id=35> 35
+</span><span class=lnt id=36> 36
+</span><span class=lnt id=37> 37
+</span><span class=lnt id=38> 38
+</span><span class=lnt id=39> 39
+</span><span class=lnt id=40> 40
+</span><span class=lnt id=41> 41
+</span><span class=lnt id=42> 42
+</span><span class=lnt id=43> 43
+</span><span class=lnt id=44> 44
+</span><span class=lnt id=45> 45
+</span><span class=lnt id=46> 46
+</span><span class=lnt id=47> 47
+</span><span class=lnt id=48> 48
+</span><span class=lnt id=49> 49
+</span><span class=lnt id=50> 50
+</span><span class=lnt id=51> 51
+</span><span class=lnt id=52> 52
+</span><span class=lnt id=53> 53
+</span><span class=lnt id=54> 54
+</span><span class=lnt id=55> 55
+</span><span class=lnt id=56> 56
+</span><span class=lnt id=57> 57
+</span><span class=lnt id=58> 58
+</span><span class=lnt id=59> 59
+</span><span class=lnt id=60> 60
+</span><span class=lnt id=61> 61
+</span><span class=lnt id=62> 62
+</span><span class=lnt id=63> 63
+</span><span class=lnt id=64> 64
+</span><span class=lnt id=65> 65
+</span><span class=lnt id=66> 66
+</span><span class=lnt id=67> 67
+</span><span class=lnt id=68> 68
+</span><span class=lnt id=69> 69
+</span><span class=lnt id=70> 70
+</span><span class=lnt id=71> 71
+</span><span class=lnt id=72> 72
+</span><span class=lnt id=73> 73
+</span><span class=lnt id=74> 74
+</span><span class=lnt id=75> 75
+</span><span class=lnt id=76> 76
+</span><span class=lnt id=77> 77
+</span><span class=lnt id=78> 78
+</span><span class=lnt id=79> 79
+</span><span class=lnt id=80> 80
+</span><span class=lnt id=81> 81
+</span><span class=lnt id=82> 82
+</span><span class=lnt id=83> 83
+</span><span class=lnt id=84> 84
+</span><span class=lnt id=85> 85
+</span><span class=lnt id=86> 86
+</span><span class=lnt id=87> 87
+</span><span class=lnt id=88> 88
+</span><span class=lnt id=89> 89
+</span><span class=lnt id=90> 90
+</span><span class=lnt id=91> 91
+</span><span class=lnt id=92> 92
+</span><span class=lnt id=93> 93
+</span><span class=lnt id=94> 94
+</span><span class=lnt id=95> 95
+</span><span class=lnt id=96> 96
+</span><span class=lnt id=97> 97
+</span><span class=lnt id=98> 98
+</span><span class=lnt id=99> 99
+</span><span class=lnt id=100>100
+</span><span class=lnt id=101>101
+</span><span class=lnt id=102>102
+</span><span class=lnt id=103>103
+</span><span class=lnt id=104>104
+</span><span class=lnt id=105>105
+</span><span class=lnt id=106>106
+</span><span class=lnt id=107>107
+</span><span class=lnt id=108>108
+</span><span class=lnt id=109>109
+</span><span class=lnt id=110>110
+</span><span class=lnt id=111>111
+</span><span class=lnt id=112>112
+</span><span class=lnt id=113>113
+</span><span class=lnt id=114>114
+</span><span class=lnt id=115>115
+</span><span class=lnt id=116>116
+</span><span class=lnt id=117>117
+</span><span class=lnt id=118>118
+</span><span class=lnt id=119>119
+</span><span class=lnt id=120>120
+</span><span class=lnt id=121>121
+</span><span class=lnt id=122>122
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=kn>from</span> <span class=nn>abc</span> <span class=kn>import</span> <span class=n>ABCMeta</span><span class=p>,</span> <span class=n>abstractmethod</span>
+<span class=kn>from</span> <span class=nn>collections</span> <span class=kn>import</span> <span class=n>OrderedDict</span>
+<span class=kn>from</span> <span class=nn>io</span> <span class=kn>import</span> <span class=n>BytesIO</span>
+<span class=kn>from</span> <span class=nn>typing</span> <span class=kn>import</span> <span class=n>Generic</span><span class=p>,</span> <span class=n>TypeVar</span><span class=p>,</span> <span class=n>ClassVar</span><span class=p>,</span> <span class=n>Any</span><span class=p>,</span> <span class=n>Dict</span><span class=p>,</span> <span class=n>Optional</span><span class=p>,</span> <span class=n>Type</span>
+
+<span class=kn>import</span> <span class=nn>msgpack</span>
+
+
+<span class=n>T</span> <span class=o>=</span> <span class=n>TypeVar</span><span class=p>(</span><span class=s1>&#39;T&#39;</span><span class=p>)</span>
+
+
+<span class=k>class</span> <span class=nc>CustomSerializer</span><span class=p>(</span><span class=n>Generic</span><span class=p>[</span><span class=n>T</span><span class=p>],</span> <span class=n>metaclass</span><span class=o>=</span><span class=n>ABCMeta</span><span class=p>):</span>
+
+    <span class=k>def</span> <span class=nf>__init_subclass__</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>code</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+        <span class=n>Serializable</span><span class=o>.</span><span class=n>add_custom_serializer</span><span class=p>(</span><span class=n>code</span><span class=o>=</span><span class=n>code</span><span class=p>,</span> <span class=n>serializer</span><span class=o>=</span><span class=bp>cls</span><span class=p>())</span>
+
+    <span class=nd>@abstractmethod</span>
+    <span class=k>def</span> <span class=nf>serialize</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>obj</span><span class=p>:</span> <span class=n>T</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=nb>bytes</span><span class=p>]:</span>
+        <span class=s2>&#34;&#34;&#34;
+</span><span class=s2>        This method should return a bytes representation of obj
+</span><span class=s2>        if it is able to serialize it and None if it doesn&#39;t
+</span><span class=s2>        support the serialization of obj.
+</span><span class=s2>        &#34;&#34;&#34;</span>
+        <span class=k>pass</span>
+
+    <span class=nd>@abstractmethod</span>
+    <span class=k>def</span> <span class=nf>deserialize</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=n>T</span><span class=p>]:</span>
+        <span class=s2>&#34;&#34;&#34;
+</span><span class=s2>        This method should return an instance of T from
+</span><span class=s2>        the bytes in data or None if there was an error.
+</span><span class=s2>        &#34;&#34;&#34;</span>
+        <span class=k>pass</span>
+
+
+<span class=k>class</span> <span class=nc>SerializableMeta</span><span class=p>(</span><span class=nb>type</span><span class=p>):</span>
+    <span class=k>def</span> <span class=fm>__call__</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=o>*</span><span class=n>args</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>):</span>
+        <span class=n>obj</span> <span class=o>=</span> <span class=nb>type</span><span class=o>.</span><span class=fm>__call__</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=o>*</span><span class=n>args</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>)</span>
+        <span class=n>obj</span><span class=o>.</span><span class=n>initialize</span><span class=p>()</span>
+        <span class=k>return</span> <span class=n>obj</span>
+
+
+<span class=k>class</span> <span class=nc>Serializable</span><span class=p>(</span><span class=n>metaclass</span><span class=o>=</span><span class=n>SerializableMeta</span><span class=p>):</span>
+    <span class=n>_classes</span><span class=p>:</span> <span class=n>ClassVar</span><span class=p>[</span><span class=n>Dict</span><span class=p>[</span><span class=nb>int</span><span class=p>,</span> <span class=n>Type</span><span class=p>[</span><span class=s1>&#39;Serializable&#39;</span><span class=p>]]]</span> <span class=o>=</span> <span class=nb>dict</span><span class=p>()</span>
+    <span class=n>_serializers</span><span class=p>:</span> <span class=n>ClassVar</span><span class=p>[</span><span class=n>Dict</span><span class=p>[</span><span class=nb>int</span><span class=p>,</span> <span class=n>CustomSerializer</span><span class=p>]]</span> <span class=o>=</span> <span class=nb>dict</span><span class=p>()</span>
+
+    <span class=k>def</span> <span class=nf>__init_subclass__</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=nb>id</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+        <span class=k>if</span> <span class=nb>id</span> <span class=ow>in</span> <span class=n>Serializable</span><span class=o>.</span><span class=n>_classes</span><span class=p>:</span>
+            <span class=k>raise</span> <span class=ne>Exception</span><span class=p>(</span>
+                <span class=n>f</span><span class=s2>&#34;Class id </span><span class=se>\&#34;</span><span class=s2>{id}</span><span class=se>\&#34;</span><span class=s2> already used by </span><span class=se>\&#34;</span><span class=s2>{Serializable._classes[id].__name__}</span><span class=se>\&#34;</span><span class=s2>&#34;</span><span class=p>)</span>
+        <span class=n>Serializable</span><span class=o>.</span><span class=n>_classes</span><span class=p>[</span><span class=nb>id</span><span class=p>]</span> <span class=o>=</span> <span class=bp>cls</span>
+
+        <span class=bp>cls</span><span class=o>.</span><span class=n>_class_id</span> <span class=o>=</span> <span class=nb>id</span>
+        <span class=bp>cls</span><span class=o>.</span><span class=n>_fields</span> <span class=o>=</span> <span class=nb>list</span><span class=p>(</span><span class=n>OrderedDict</span><span class=o>.</span><span class=n>fromkeys</span><span class=p>([</span>
+            <span class=n>field</span> <span class=k>for</span> <span class=n>fields</span> <span class=ow>in</span> <span class=p>[</span>
+                <span class=n>c</span><span class=o>.</span><span class=n>fields</span> <span class=k>for</span> <span class=n>c</span> <span class=ow>in</span> <span class=nb>reversed</span><span class=p>(</span><span class=bp>cls</span><span class=o>.</span><span class=vm>__mro__</span><span class=p>)</span>
+                <span class=k>if</span> <span class=nb>hasattr</span><span class=p>(</span><span class=n>c</span><span class=p>,</span> <span class=s1>&#39;fields&#39;</span><span class=p>)</span> <span class=ow>and</span> <span class=n>c</span><span class=o>.</span><span class=n>fields</span> <span class=ow>is</span> <span class=ow>not</span> <span class=bp>None</span>
+            <span class=p>]</span> <span class=k>for</span> <span class=n>field</span> <span class=ow>in</span> <span class=n>fields</span>
+        <span class=p>]))</span>
+
+    <span class=nd>@classmethod</span>
+    <span class=k>def</span> <span class=nf>ext_hook</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>code</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span> <span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Any</span><span class=p>:</span>
+        <span class=n>serializer</span> <span class=o>=</span> <span class=bp>cls</span><span class=o>.</span><span class=n>_serializers</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>code</span><span class=p>)</span>
+        <span class=k>if</span> <span class=n>serializer</span><span class=p>:</span>
+            <span class=k>return</span> <span class=n>serializer</span><span class=o>.</span><span class=n>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>)</span>
+
+    <span class=nd>@classmethod</span>
+    <span class=k>def</span> <span class=nf>deserialize</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=s1>&#39;Serializable&#39;</span><span class=p>]:</span>
+        <span class=k>with</span> <span class=n>BytesIO</span><span class=p>(</span><span class=n>data</span><span class=p>)</span> <span class=k>as</span> <span class=nb>buffer</span><span class=p>:</span>
+            <span class=n>unpacker</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Unpacker</span><span class=p>(</span>
+                <span class=nb>buffer</span><span class=p>,</span> <span class=n>ext_hook</span><span class=o>=</span><span class=bp>cls</span><span class=o>.</span><span class=n>ext_hook</span><span class=p>,</span> <span class=n>raw</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+
+            <span class=n>class_id</span> <span class=o>=</span> <span class=n>unpacker</span><span class=o>.</span><span class=n>unpack</span><span class=p>()</span>
+            <span class=bp>cls</span> <span class=o>=</span> <span class=n>Serializable</span><span class=o>.</span><span class=n>_classes</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>class_id</span><span class=p>)</span>
+            <span class=k>if</span> <span class=ow>not</span> <span class=bp>cls</span><span class=p>:</span>
+                <span class=k>return</span> <span class=bp>None</span>
+
+            <span class=n>instance</span> <span class=o>=</span> <span class=bp>cls</span><span class=o>.</span><span class=fm>__new__</span><span class=p>(</span><span class=bp>cls</span><span class=p>)</span>
+            <span class=k>for</span> <span class=n>field</span> <span class=ow>in</span> <span class=bp>cls</span><span class=o>.</span><span class=n>_fields</span><span class=p>:</span>
+                <span class=k>print</span><span class=p>(</span><span class=n>f</span><span class=s2>&#34;Deserializing: {field}&#34;</span><span class=p>)</span>
+                <span class=nb>setattr</span><span class=p>(</span><span class=n>instance</span><span class=p>,</span> <span class=n>field</span><span class=p>,</span> <span class=n>unpacker</span><span class=o>.</span><span class=n>unpack</span><span class=p>())</span>
+
+            <span class=k>return</span> <span class=n>instance</span>
+
+    <span class=nd>@classmethod</span>
+    <span class=k>def</span> <span class=nf>add_custom_serializer</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>code</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span> <span class=n>serializer</span><span class=p>:</span> <span class=n>CustomSerializer</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=bp>None</span><span class=p>:</span>
+        <span class=k>if</span> <span class=n>code</span> <span class=ow>in</span> <span class=bp>cls</span><span class=o>.</span><span class=n>_serializers</span><span class=p>:</span>
+            <span class=k>raise</span> <span class=ne>Exception</span><span class=p>(</span><span class=n>f</span><span class=s2>&#34;Serializer code {code} already in use&#34;</span><span class=p>)</span>
+        <span class=bp>cls</span><span class=o>.</span><span class=n>_serializers</span><span class=p>[</span><span class=n>code</span><span class=p>]</span> <span class=o>=</span> <span class=n>serializer</span>
+
+    <span class=k>def</span> <span class=nf>initialize</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=s2>&#34;&#34;&#34;Placeholder, should be overridden if necessary&#34;&#34;&#34;</span>
+        <span class=k>pass</span>
+
+    <span class=k>def</span> <span class=nf>serialize</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>bytes</span><span class=p>:</span>
+        <span class=k>def</span> <span class=nf>default</span><span class=p>(</span><span class=n>obj</span><span class=p>:</span> <span class=n>Any</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>ExtType</span><span class=p>:</span>
+            <span class=k>for</span> <span class=n>code</span><span class=p>,</span> <span class=n>serializer</span> <span class=ow>in</span> <span class=bp>self</span><span class=o>.</span><span class=n>_serializers</span><span class=o>.</span><span class=n>items</span><span class=p>():</span>
+                <span class=n>data</span> <span class=o>=</span> <span class=n>serializer</span><span class=o>.</span><span class=n>serialize</span><span class=p>(</span><span class=n>obj</span><span class=p>)</span>
+                <span class=k>if</span> <span class=n>data</span><span class=p>:</span>
+                    <span class=k>return</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>ExtType</span><span class=p>(</span><span class=n>code</span><span class=p>,</span> <span class=n>data</span><span class=p>)</span>
+            <span class=k>raise</span> <span class=ne>TypeError</span><span class=p>(</span><span class=n>f</span><span class=s2>&#34;Unknown type encountered: {obj}&#34;</span><span class=p>)</span>
+
+        <span class=n>packer</span> <span class=o>=</span> <span class=n>msgpack</span><span class=o>.</span><span class=n>Packer</span><span class=p>(</span><span class=n>default</span><span class=o>=</span><span class=n>default</span><span class=p>,</span> <span class=n>autoreset</span><span class=o>=</span><span class=bp>False</span><span class=p>)</span>
+
+        <span class=n>packer</span><span class=o>.</span><span class=n>pack</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>_class_id</span><span class=p>)</span>
+
+        <span class=k>for</span> <span class=n>field</span> <span class=ow>in</span> <span class=bp>self</span><span class=o>.</span><span class=vm>__class__</span><span class=o>.</span><span class=n>_fields</span><span class=p>:</span>
+            <span class=k>print</span><span class=p>(</span><span class=n>f</span><span class=s2>&#34;Serializing: {field}&#34;</span><span class=p>)</span>
+            <span class=n>packer</span><span class=o>.</span><span class=n>pack</span><span class=p>(</span><span class=nb>getattr</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>field</span><span class=p>))</span>
+
+        <span class=k>return</span> <span class=n>packer</span><span class=o>.</span><span class=n>bytes</span><span class=p>()</span>
+
+
+<span class=k>class</span> <span class=nc>SerializableSerializer</span><span class=p>(</span><span class=n>CustomSerializer</span><span class=p>[</span><span class=n>Serializable</span><span class=p>],</span> <span class=n>code</span><span class=o>=</span><span class=mh>0x00</span><span class=p>):</span>
+
+    <span class=k>def</span> <span class=nf>serialize</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>obj</span><span class=p>:</span> <span class=n>Serializable</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=nb>bytes</span><span class=p>]:</span>
+        <span class=k>print</span><span class=p>(</span><span class=n>obj</span><span class=p>,</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>obj</span><span class=p>,</span> <span class=n>Serializable</span><span class=p>))</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>obj</span><span class=p>,</span> <span class=n>Serializable</span><span class=p>):</span>
+            <span class=k>return</span> <span class=bp>None</span>
+        <span class=k>return</span> <span class=n>obj</span><span class=o>.</span><span class=n>serialize</span><span class=p>()</span>
+
+    <span class=k>def</span> <span class=nf>deserialize</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>data</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=n>Serializable</span><span class=p>]:</span>
+        <span class=k>return</span> <span class=n>Serializable</span><span class=o>.</span><span class=n>deserialize</span><span class=p>(</span><span class=n>data</span><span class=p>)</span>
+</code></pre></td></tr></table></div></div></div></aside><aside class=series-intro><p>This article is part of a series documenting the development of a framework powering collaborative editing experiences where networked clients control a shared state on the server. It is based on open source work done as part of the <a href=https://sat.qc.ca/recherche/metalab>Metalab</a> team of the <a href=https://sat.qc.ca>Société des Arts Technologiques</a> from 2017 to 2018. The source code is still evolving today and is available on the <a href=https://gitlab.com/sat-metalab/py-satnet>Metalab&rsquo;s Gitlab</a>.</p><ul><li><a href=https://ubald.dev/articles/network-collaboration/introduction/ title="Networking Library Requirements">Part 1 - Networking Library Requirements</a></li><li><a href=https://ubald.dev/articles/network-collaboration/serialization/ class=active title="Python Class Serialization">Part 2 - Python Class Serialization</a></li></ul></aside><hr><section class=author><img src=https://ubald.dev/about/avatar_hu5e33536049a2f51a6d68033afee7db6a_45895_256x256_fit_q90_lanczos.jpg class=avatar aria-hidden=true><div class=bio aria-label="Author's biography"><span class=author aria-label=Author><a href=https://ubald.dev/about/ title="Author name">François Ubald Brien</a></span><p>Skilled, self-taught back-end developer fluent in TypeScript/Javascript, Python, PHP and C++.</p></div></section></section></article></main><footer class=main-footer><h1 class=site-logo><a href=/ title="Ubald.dev Home">Ubald<span class=dot>.</span>dev</a></h1><nav class=menu role=navigation><ul><li><a href=/articles/ title=Articles>Articles</a></li><li><a href=/about/ title=About>About</a></li></ul></nav><div class=copyright>©2020 François Ubald Brien. All rights reserved.</div></footer></div><script src=/js/script.js></script></body></html>
