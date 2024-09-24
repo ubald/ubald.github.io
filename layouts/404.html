@@ -1,12 +1,13 @@
 {{ define "main" }}
 {{ $poster := resources.Get "images/cats/mini.jpg" }}
 {{ $poster = $poster.Fit "1600x1600 q80 jpg" }}
+
 <article class="home">
-    <header>
+    <header class="cover">
         <img src="{{ $poster.Permalink }}" class="poster" />
         <div class="titling">
-            <h1 class="title">404<br />Not Found</h1>
-            <div class="excerpt">
+            <h1 class="title" aria-label="Title">404<br />Not Found</h1>
+            <div class="excerpt" aria-label="Excerpt">
                 &gt;&nbsp;The requested page could not be found.
             </div>
         </div>
