@@ -1,8 +1,8 @@
 ---
-title: Knowing how to write doesn't make oneself an author
-summary: Don't just write code, author it.
+title: I are programmer
+summary: I make computers go beep boop beep boop
 date: 2020-09-08
-poster: images/home.jpg
+poster: images/cats/mini-derp.jpg
 cascade:
     author: ubald
 ---
