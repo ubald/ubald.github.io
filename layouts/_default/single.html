@@ -23,7 +23,7 @@
             {{- end }}
             <h1 class="title" aria-label="Post title">{{ .Title }}</h1>
             <div class="excerpt" aria-label="Excerpt">
-                <span class="prompt">&gt;</span>&nbsp;{{ .Summary }}
+                <span class="prompt">&gt;</span>&nbsp;<span class="input">{{ .Summary }}</span>
             </div>
         </div>
         {{ if not (eq .Type "authors") -}}

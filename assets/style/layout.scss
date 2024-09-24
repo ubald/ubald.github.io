@@ -156,7 +156,7 @@ img.poster {
 
         color: var(--category-color);
         .home & {
-            color: $blue;
+            color: $invertedForegroundColor;
         }
     }
 
@@ -169,6 +169,13 @@ img.poster {
     > .excerpt {
         @include lg {
             font-size: 1.5rem;
+        }
+        .prompt {
+            color: $accent;
+        }
+        .input {
+            color: $textColor;
+            background-color: $invertedMediumTextColor;
         }
     }
 }

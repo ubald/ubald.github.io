@@ -3,7 +3,11 @@
 {{ if isset .Params "poster" }}
 {{ $poster := resources.Get .Params.poster }}
 {{ if $poster }}
-{{ .Scratch.Set "poster" ($poster.Fit "1600x1600 q80 jpg") }}
+{{ if .Params.poster_monochrome }}
+{{ .Scratch.Set "poster" ($poster.Fit "1600x1600 q80 jpg" | images.Filter images.Grayscale ) }}
+{{ else }}
+{{ .Scratch.Set "poster" ($poster.Fit "1600x1600 q80 jpg" ) }}
+{{ end }}
 {{ end }}
 {{ end }}
 {{ $poster := .Scratch.Get "poster" }}
@@ -17,7 +21,7 @@
             <h1 class="title" aria-label="Title">{{ .Params.title }}</h1>
             {{ with .Summary }}
             <div class="excerpt" aria-label="Excerpt">
-                &gt;&nbsp;{{ . }}
+                <span class="prompt">&gt;</span>&nbsp;<span class="input">{{ . }}</span>
             </div>
             {{ end }}
         </div>

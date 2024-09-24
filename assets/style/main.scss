@@ -16,6 +16,7 @@ $orange: #d19a66;
 $red: #be5046;
 
 $blue_accent: #528bff;
+$accent: #ff3366;
 
 // One Dark Vivid
 $purple: hsl(286, 82%, 79%);
@@ -45,7 +46,7 @@ $red: hsl(  5, 91%, 73%);
 // $red: #c1a2a2;
 
 $invertedBackground: #222;
-$invertedTitleColor: $blue;
+$invertedTitleColor: $accent;//$blue;
 $invertedForegroundColor: #eee;
 $invertedMediumTextColor: #aaa;
 $invertedDarkTextColor: #666;
