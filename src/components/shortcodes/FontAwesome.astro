@@ -1,0 +1,8 @@
+---
+/** The former `fontawesome` shortcode: a Font Awesome brand icon, e.g. `<FontAwesome icon="github" />`. */
+interface Props {
+    icon: string;
+}
+---
+
+<i class={`fab fa-${Astro.props.icon}`}></i>

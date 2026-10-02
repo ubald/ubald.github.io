@@ -1,0 +1,29 @@
+---
+import { fit } from "~/lib/images.ts";
+import type { Page } from "~/lib/pages.ts";
+
+interface Props {
+    page: Page;
+}
+
+const { author } = Astro.props.page;
+const avatar = author?.params.avatar && (await fit(author.params.avatar, 256, { quality: 90, format: "jpg" }));
+---
+
+<section class="author">
+    {
+        author && (
+            <>
+                {avatar && <img src={avatar} class="avatar" aria-hidden="true" />}
+                <div class="bio" aria-label="Author's biography">
+                    <span class="author" aria-label="Author">
+                        <a href={author.url} title="Author name">
+                            {author.params.name}
+                        </a>
+                    </span>
+                    <p>{author.summary}</p>
+                </div>
+            </>
+        )
+    }
+</section>

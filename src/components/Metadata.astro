@@ -1,0 +1,54 @@
+---
+import { formatLongDate } from "~/lib/dates.ts";
+import { fit } from "~/lib/images.ts";
+import { humanize, urlize, type Page } from "~/lib/pages.ts";
+
+interface Props {
+    page: Page;
+}
+
+const { page } = Astro.props;
+const { author } = page;
+const avatar = author?.params.avatar && (await fit(author.params.avatar, 128, { quality: 80, format: "jpg" }));
+const categories: string[] = [...new Set<string>(page.params.categories ?? [])];
+const tags: string[] = [...new Set<string>(page.params.tags ?? [])];
+---
+
+<div class="metadata">
+    {
+        author && avatar && (
+            <a href={author.url} title="Author">
+                <img src={avatar} class="avatar" title="Avatar" aria-hidden="true" />
+            </a>
+        )
+    }
+    <div>
+        <div class="byline">
+            {
+                author && (
+                    <span class="author" aria-label="Author">
+                        <a href={author.url} title="Author">{author.params.name}</a>
+                    </span>
+                )
+            }
+            {page.date && <span class="date" title="Published date">{formatLongDate(page.date)}</span>}
+        </div>
+        <ul class="labels">
+            <li class="read-time" title="Reading time"><i class="far fa-clock"></i>{page.readingTime} minutes</li>
+            {
+                categories.map((category) => (
+                    <li class={`category category-${category} label`} title={`Category ${humanize(category)}`}>
+                        <a href={`/categories/${urlize(category)}`}>{humanize(category)}</a>
+                    </li>
+                ))
+            }
+            {
+                tags.map((tag) => (
+                    <li class={`tag tag-${tag} label`} title={`Tag ${humanize(tag)}`}>
+                        <a href={`/tags/${urlize(tag)}`}>#{tag}</a>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+</div>

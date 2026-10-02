@@ -1,0 +1,26 @@
+---
+import type { ImageMetadata } from "astro";
+import { fit } from "~/lib/images.ts";
+import { urlize } from "~/lib/text.ts";
+
+/** The former `job` shortcode: a résumé entry, with the description as children. */
+interface Props {
+    logo: ImageMetadata;
+    title: string;
+    company: string;
+    date: string;
+    location: string;
+}
+
+const { logo, title, company, date, location } = Astro.props;
+const logoSrc = await fit(logo, 128, { format: "png" });
+---
+
+<section class="job">
+    <img src={logoSrc} class="logo" aria-hidden="true" />
+    <h4 id={`${urlize(company)}-${urlize(title)}`} class="title">{title}</h4>
+    <h3 id={urlize(company)} class="company">{company}</h3>
+    <div class="date">{date}</div>
+    <div class="location">{location}</div>
+    <div class="description"><slot /></div>
+</section>

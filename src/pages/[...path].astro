@@ -1,0 +1,33 @@
+---
+import type { GetStaticPaths } from "astro";
+import List from "~/components/layouts/List.astro";
+import Single from "~/components/layouts/Single.astro";
+import Base from "~/layouts/Base.astro";
+import { getSite } from "~/lib/pages.ts";
+import { paginate } from "~/lib/pagination.ts";
+
+/** Every page but the home page: articles, the About page, and the paginated lists. */
+export const getStaticPaths = (async () => {
+    const param = (url: string) => url.replace(/^\/|\/$/g, "") || undefined;
+    const { pages } = await getSite();
+    return pages.flatMap((page) => {
+        if (page.kind === "home") return [];
+        if (page.kind === "page") return [{ params: { path: param(page.url) }, props: { page } }];
+        const pagers = paginate(page);
+        return [
+            ...pagers.map((pager) => ({ params: { path: param(pager.url(pager.pageNumber)) }, props: { page, pager } })),
+            // Like Hugo, the first page also exists as `page/1/`, redirecting to the list.
+            { params: { path: param(`${page.url}page/1/`) }, props: { page, redirect: page.url } },
+        ];
+    });
+}) satisfies GetStaticPaths;
+
+const { page, pager, redirect } = Astro.props as Awaited<ReturnType<typeof getStaticPaths>>[number]["props"] & {
+    pager?: ReturnType<typeof paginate>[number];
+    redirect?: string;
+};
+
+if (redirect) return Astro.redirect(redirect, 301);
+---
+
+<Base page={page}>{pager ? <List page={page} pager={pager} /> : <Single page={page} />}</Base>

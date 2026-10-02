@@ -1,0 +1,27 @@
+---
+import { toHtml } from "hast-util-to-html";
+import { highlight } from "~/lib/highlight.ts";
+
+/**
+ * The former `sourcefile` shortcode: a collapsible, highlighted source file of the page bundle,
+ * with a link to download it (bundle files are published next to the page).
+ */
+interface Props {
+    filename: string;
+    source: string;
+}
+
+const { filename, source } = Astro.props;
+const language = filename.endsWith(".py") ? "python" : "";
+const id = `toggle-${Buffer.from(filename).toString("base64")}`;
+const code = toHtml(await highlight(source, language));
+---
+
+<aside class="collapsable">
+    <input id={id} type="checkbox" />
+    <label for={id}>
+        <div class="title"><i class="far fa-file-alt"></i>&nbsp;Expand <code>{filename}</code> source.</div>
+        <div class="download"><a href={filename}><i class="fas fa-file-download"></i>&nbsp;Download</a></div>
+    </label>
+    <div class="content" set:html={code} />
+</aside>

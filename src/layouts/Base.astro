@@ -1,0 +1,48 @@
+---
+import "~/styles/main.scss";
+import Logo from "~/components/Logo.astro";
+import Menu from "~/components/Menu.astro";
+import Meta from "~/components/Meta.astro";
+import { inSeries, seriesPartNumber, type Page } from "~/lib/pages.ts";
+import { site } from "~/lib/site.ts";
+
+interface Props {
+    page: Page;
+}
+
+const { page } = Astro.props;
+const title = inSeries(page) ? `${page.title} - ${page.parent!.title} Part ${seriesPartNumber(page)}` : page.title;
+const description = page.params.description || page.params.summary || site.description;
+const hasFeed = !["page", "404"].includes(page.kind);
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{title} | {site.title}</title>
+        <meta name="description" content={description} />
+        <script is:inline src="https://kit.fontawesome.com/7f3bbce892.js" crossorigin="anonymous" defer></script>
+        {hasFeed && <link rel="alternate" type="application/rss+xml" href={new URL(`${page.url}index.xml`, Astro.site)} title={site.title} />}
+        <Meta page={page} />
+        <link rel="me" href={site.mastodon} />
+    </head>
+    <body>
+        <div class="container">
+            <header class="main-header">
+                <Logo />
+                <Menu />
+            </header>
+            <main>
+                <slot />
+            </main>
+            <footer class="main-footer">
+                <Logo />
+                <Menu />
+                <div class="copyright">{site.copyright}</div>
+            </footer>
+        </div>
+        <script is:inline src="/js/script.js"></script>
+    </body>
+</html>

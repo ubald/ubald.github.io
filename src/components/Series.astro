@@ -1,0 +1,30 @@
+---
+import { render } from "astro:content";
+import { seriesPartNumber, type Page } from "~/lib/pages.ts";
+
+interface Props {
+    page: Page;
+}
+
+const { page } = Astro.props;
+const section = page.kind === "page" ? page.parent : page;
+const isSeries = section?.params.type === "series";
+const Content = isSeries && section.entry ? (await render(section.entry)).Content : undefined;
+---
+
+{
+    isSeries && (
+        <aside class="series-intro">
+            {Content && <Content />}
+            <ul>
+                {[...section.pages].reverse().map((part) => (
+                    <li>
+                        <a href={part.url} class={part === page ? "active" : undefined} title={part.title}>
+                            Part {seriesPartNumber(part)} - {part.title}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </aside>
+    )
+}
