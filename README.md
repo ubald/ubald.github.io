@@ -19,7 +19,8 @@ components such as `<Figure>` or `<SourceFile>`) and its images and files. Pages
 
 ## Publishing
 
-Pushing to `master` builds the site and deploys it to GitHub Pages (`.github/workflows/deploy.yaml`).
+Pushing to `master` builds the site and deploys it to GitHub Pages (`.github/workflows/deploy.yaml`). Pull requests and
+pushes to `develop` only build it, so work merges into `develop` and is published by merging `develop` into `master`.
 
 ## Quotes
 
