@@ -8,14 +8,28 @@ import sharp, { type FormatEnum } from "sharp";
  */
 const service: LocalImageService = {
     ...sharpService,
-    propertiesToHash: [...(sharpService.propertiesToHash ?? ["src", "width", "height", "format", "quality", "fit", "position", "background"]), "grayscale"],
+    propertiesToHash: [
+        ...(sharpService.propertiesToHash ?? [
+            "src",
+            "width",
+            "height",
+            "format",
+            "quality",
+            "fit",
+            "position",
+            "background",
+        ]),
+        "grayscale",
+    ],
     async getURL(options, imageConfig, logger) {
         const url = await sharpService.getURL(options, imageConfig, logger);
         return options.grayscale ? `${url}&grayscale=true` : url;
     },
     parseURL(url, imageConfig, logger) {
         // The base service parses synchronously.
-        const options = sharpService.parseURL(url, imageConfig, logger) as Awaited<ReturnType<typeof sharpService.parseURL>>;
+        const options = sharpService.parseURL(url, imageConfig, logger) as Awaited<
+            ReturnType<typeof sharpService.parseURL>
+        >;
         if (options && url.searchParams.get("grayscale") === "true") options.grayscale = true;
         return options;
     },
@@ -24,7 +38,10 @@ const service: LocalImageService = {
         if (!options.grayscale) return result;
         const quality = typeof options.quality === "number" ? options.quality : undefined;
         const format = (result.format === "jpg" ? "jpeg" : result.format) as keyof FormatEnum;
-        const data = await sharp(result.data).grayscale().toFormat(format, quality ? { quality } : {}).toBuffer();
+        const data = await sharp(result.data)
+            .grayscale()
+            .toFormat(format, quality ? { quality } : {})
+            .toBuffer();
         return { data: new Uint8Array(data), format: result.format };
     },
 };

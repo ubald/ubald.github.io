@@ -60,50 +60,58 @@ function bundleGlob(options: Parameters<typeof glob>[0], imageFields: string[]):
 // Hugo's `_index.md` branch bundles: the home page and the article sections (and series).
 const sections = defineCollection({
     loader: bundleGlob({ base: "./src/content", pattern: "**/_index.md", generateId: pathId }, ["poster"]),
-    schema: ({ image }) => z.object({
-        title: z.string(),
-        type: z.string().optional(),
-        summary: z.string().optional(),
-        description: z.string().optional(),
-        date: z.coerce.date().optional(),
-        poster: image().optional(),
-        poster_monochrome: z.boolean().optional(),
-        cascade: z.object({ author: z.string().optional() }).optional(),
-    }),
+    schema: ({ image }) =>
+        z.object({
+            title: z.string(),
+            type: z.string().optional(),
+            summary: z.string().optional(),
+            description: z.string().optional(),
+            date: z.coerce.date().optional(),
+            poster: image().optional(),
+            poster_monochrome: z.boolean().optional(),
+            cascade: z.object({ author: z.string().optional() }).optional(),
+        }),
 });
 
 const articles = defineCollection({
-    loader: bundleGlob({ base: "./src/content/articles", pattern: "**/index.{md,mdx}", generateId: pathId }, ["poster"]),
-    schema: ({ image }) => z.object({
-        title: z.string(),
-        slug: z.string().optional(),
-        summary: z.string().optional(),
-        description: z.string().optional(),
-        excerpt: z.string().optional(),
-        date: z.coerce.date().optional(),
-        draft: z.boolean().default(false),
-        author: z.string().optional(),
-        category: z.string().optional(),
-        categories: stringList,
-        tags: stringList,
-        poster: image().optional(),
-    }),
+    loader: bundleGlob({ base: "./src/content/articles", pattern: "**/index.{md,mdx}", generateId: pathId }, [
+        "poster",
+    ]),
+    schema: ({ image }) =>
+        z.object({
+            title: z.string(),
+            slug: z.string().optional(),
+            summary: z.string().optional(),
+            description: z.string().optional(),
+            excerpt: z.string().optional(),
+            date: z.coerce.date().optional(),
+            draft: z.boolean().default(false),
+            author: z.string().optional(),
+            category: z.string().optional(),
+            categories: stringList,
+            tags: stringList,
+            poster: image().optional(),
+        }),
 });
 
 const authors = defineCollection({
-    loader: bundleGlob({ base: "./src/content/authors", pattern: "*/index.md", generateId: pathId }, ["poster", "avatar"]),
-    schema: ({ image }) => z.object({
-        title: z.string(),
-        shortname: z.string(),
-        name: z.string(),
-        email: z.string().optional(),
-        github: z.string().optional(),
-        linkedin: z.string().optional(),
-        poster: image().optional(),
-        avatar: image().optional(),
-        url: z.string().optional(),
-        summary: z.string().optional(),
-    }),
+    loader: bundleGlob({ base: "./src/content/authors", pattern: "*/index.md", generateId: pathId }, [
+        "poster",
+        "avatar",
+    ]),
+    schema: ({ image }) =>
+        z.object({
+            title: z.string(),
+            shortname: z.string(),
+            name: z.string(),
+            email: z.string().optional(),
+            github: z.string().optional(),
+            linkedin: z.string().optional(),
+            poster: image().optional(),
+            avatar: image().optional(),
+            url: z.string().optional(),
+            summary: z.string().optional(),
+        }),
 });
 
 export const collections = { sections, articles, authors };

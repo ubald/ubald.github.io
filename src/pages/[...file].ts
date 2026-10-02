@@ -12,20 +12,32 @@ export const getStaticPaths = (async () => {
     const { pages, regularPages, resources } = await getSite();
     // The home feed lists every regular page, sections their own pages, taxonomies their terms.
     const feedItems = (page: Page) =>
-        page.kind === "home" ? regularPages : page.kind === "taxonomy" ? page.terms! : page.kind === "section" ? page.pages : page.listPages;
+        page.kind === "home"
+            ? regularPages
+            : page.kind === "taxonomy"
+              ? page.terms!
+              : page.kind === "section"
+                ? page.pages
+                : page.listPages;
     return [
         ...pages
             .filter((page) => page.kind !== "page")
-            .map((page) => ({ params: { file: `${page.url.slice(1)}index.xml` }, props: { feed: page, items: feedItems(page) } as Props })),
+            .map((page) => ({
+                params: { file: `${page.url.slice(1)}index.xml` },
+                props: { feed: page, items: feedItems(page) } as Props,
+            })),
         { params: { file: "sitemap.xml" }, props: { sitemap: pages } as Props },
         ...resources.map(({ url, file }) => ({ params: { file: url.slice(1) }, props: { resource: file } as Props })),
     ];
 }) satisfies GetStaticPaths;
 
-const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const escape = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 const xml = (body: string, type: string) =>
-    new Response(`<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n${body}`, { headers: { "Content-Type": `${type}; charset=utf-8` } });
+    new Response(`<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n${body}`, {
+        headers: { "Content-Type": `${type}; charset=utf-8` },
+    });
 
 /** Hugo's built-in RSS template. */
 function feed(page: Page, items: Page[], base: URL) {
