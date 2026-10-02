@@ -71,7 +71,11 @@ export const byDefaultOrder = (a: Page, b: Page) =>
 
 const defined = (data: object) => Object.fromEntries(Object.entries(data).filter(([, value]) => value !== undefined));
 
-const latestDate = (pages: Page[]) => pages.map((p) => p.date).filter((d): d is Date => !!d).sort((a, b) => b.getTime() - a.getTime())[0];
+const latestDate = (pages: Page[]) =>
+    pages
+        .map((p) => p.date)
+        .filter((d): d is Date => !!d)
+        .sort((a, b) => b.getTime() - a.getTime())[0];
 
 const newPage = (page: Partial<Page> & Pick<Page, "kind" | "type" | "title" | "url">): Page => ({
     params: {},
@@ -148,7 +152,7 @@ async function buildSite(): Promise<Site> {
             const title = top.charAt(0).toUpperCase() + top.slice(1);
             sections.set(top, newPage({ kind: "section", type: top, title, url: `/${top}/` }));
         }
-        for (let dir = path; dir.includes("/"); ) {
+        for (let dir = path; dir.includes("/");) {
             dir = dir.slice(0, dir.lastIndexOf("/"));
             if (sections.has(dir)) return sections.get(dir)!;
         }
@@ -210,7 +214,10 @@ async function buildSite(): Promise<Site> {
             for (const term of new Set<string>(page.params[plural] ?? [])) {
                 const key = urlize(term);
                 if (!terms.has(key)) {
-                    terms.set(key, newPage({ kind: "term", type: plural, title: term, url: `/${plural}/${key}/`, singular }));
+                    terms.set(
+                        key,
+                        newPage({ kind: "term", type: plural, title: term, url: `/${plural}/${key}/`, singular }),
+                    );
                 }
                 terms.get(key)!.listPages.push(page);
             }
@@ -249,6 +256,7 @@ export const isList = (page: Page) => page.kind !== "page";
 export const inSeries = (page: Page) => page.parent?.type === "series";
 
 /** Position of the page in its series (Hugo's `values/series-part-number` partial). */
-export const seriesPartNumber = (page: Page) => (inSeries(page) ? [...page.parent!.pages].reverse().indexOf(page) + 1 : 0);
+export const seriesPartNumber = (page: Page) =>
+    inSeries(page) ? [...page.parent!.pages].reverse().indexOf(page) + 1 : 0;
 
 export { humanize, urlize };

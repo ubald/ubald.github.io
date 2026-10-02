@@ -8,7 +8,11 @@ interface FitOptions {
 }
 
 /** Hugo's `.Fit "<size>x<size>"`: scaled down (never up) to fit in a square, keeping the aspect ratio. */
-export async function fit(image: ImageMetadata, size: number, { quality, format, grayscale }: FitOptions): Promise<string> {
+export async function fit(
+    image: ImageMetadata,
+    size: number,
+    { quality, format, grayscale }: FitOptions,
+): Promise<string> {
     // Read the metadata from a clone: reading the image itself would also publish the original file.
     const { width, height, format: sourceFormat } = (image as ImageMetadata & { clone?: ImageMetadata }).clone ?? image;
     const scale = Math.min(1, size / width, size / height);

@@ -99,8 +99,12 @@ const text = (value: string): ElementContent => ({ type: "text", value });
 /** Parses Hugo's code fence options, e.g. `{hl_lines=["1","6-11"]}`, into the highlighted line numbers. */
 export function highlightedLines(meta: string | undefined): Set<number> {
     const lines = new Set<number>();
-    const hlLines = meta?.match(/hl_lines\s*=\s*\[([^\]]*)\]/)?.[1] ?? meta?.match(/hl_lines\s*=\s*"([^"]*)"/)?.[1] ?? "";
-    for (const range of hlLines.replace(/"/g, "").split(/[\s,]+/).filter(Boolean)) {
+    const hlLines =
+        meta?.match(/hl_lines\s*=\s*\[([^\]]*)\]/)?.[1] ?? meta?.match(/hl_lines\s*=\s*"([^"]*)"/)?.[1] ?? "";
+    for (const range of hlLines
+        .replace(/"/g, "")
+        .split(/[\s,]+/)
+        .filter(Boolean)) {
         const [start, end = start] = range.split("-").map(Number);
         for (let line = start; line <= end; line++) lines.add(line);
     }
@@ -124,7 +128,9 @@ export async function highlight(code: string, lang = "", hlLines = new Set<numbe
         const flush = () => {
             if (!previous) return;
             lineChildren.push(
-                previous.className ? element("span", { className: [previous.className] }, [text(previous.value)]) : text(previous.value),
+                previous.className
+                    ? element("span", { className: [previous.className] }, [text(previous.value)])
+                    : text(previous.value),
             );
             previous = undefined;
         };
@@ -132,7 +138,11 @@ export async function highlight(code: string, lang = "", hlLines = new Set<numbe
             const parts = token.explanation ?? [{ content: token.content, scopes: [] }];
             for (const part of parts) {
                 // Like Chroma, whitespace between tokens stays bare text.
-                const className = classFor(language, part.content, part.scopes.map((s) => s.scopeName));
+                const className = classFor(
+                    language,
+                    part.content,
+                    part.scopes.map((s) => s.scopeName),
+                );
                 if (previous && previous.className === className) {
                     previous.value += part.content;
                 } else {
@@ -143,12 +153,16 @@ export async function highlight(code: string, lang = "", hlLines = new Set<numbe
         }
         flush();
         lineChildren.push(text("\n"));
-        codeChildren.push(...(hlLines.has(index + 1) ? [element("span", { className: ["hl"] }, lineChildren)] : lineChildren));
+        codeChildren.push(
+            ...(hlLines.has(index + 1) ? [element("span", { className: ["hl"] }, lineChildren)] : lineChildren),
+        );
     });
 
     const width = String(lines.length).length;
     const lineNumbers = lines.map((_, index) => {
-        const number = element("span", { className: ["lnt"], id: String(index + 1) }, [text(`${String(index + 1).padStart(width)}\n`)]);
+        const number = element("span", { className: ["lnt"], id: String(index + 1) }, [
+            text(`${String(index + 1).padStart(width)}\n`),
+        ]);
         return hlLines.has(index + 1) ? element("span", { className: ["hl"] }, [number]) : number;
     });
 
@@ -157,7 +171,9 @@ export async function highlight(code: string, lang = "", hlLines = new Set<numbe
         element("div", { className: ["chroma"] }, [
             element("table", { className: ["lntable"] }, [
                 element("tr", {}, [
-                    element("td", { className: ["lntd"] }, [element("pre", { className: ["chroma"] }, [element("code", {}, lineNumbers)])]),
+                    element("td", { className: ["lntd"] }, [
+                        element("pre", { className: ["chroma"] }, [element("code", {}, lineNumbers)]),
+                    ]),
                     element("td", { className: ["lntd"] }, [
                         element("pre", { className: ["chroma"] }, [element("code", codeProperties, codeChildren)]),
                     ]),
