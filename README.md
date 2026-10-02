@@ -5,6 +5,8 @@ The source of [ubald.dev](https://ubald.dev), built with [Astro](https://astro.b
 ## Running
 
 Requires Node 24 and pnpm. With Nix, `direnv allow` (or `nix develop`) enters a shell that provides both.
+For WebStorm (WSL), use `<repo>/.direnv/bin/node` as the Node interpreter and `<repo>/.direnv/bin/pnpm` as the package
+manager; both links are created when the dev shell loads.
 
 ```sh
 pnpm install
