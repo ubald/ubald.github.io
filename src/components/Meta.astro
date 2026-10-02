@@ -1,0 +1,50 @@
+---
+import { formatIso } from "~/lib/dates.ts";
+import type { Page } from "~/lib/pages.ts";
+import { site } from "~/lib/site.ts";
+
+interface Props {
+    page: Page;
+}
+
+const { page } = Astro.props;
+const isPage = page.kind === "page";
+const permalink = new URL(page.url, Astro.site).href;
+const description = page.params.description || (isPage ? page.summary : site.description);
+const keywords = (page.params.tags ?? []).map((tag: string) => `${tag},`).join("");
+---
+
+<!-- Schema -->
+<meta itemprop="name" content={page.title} />
+<meta itemprop="description" content={description} />
+{
+    isPage && (
+        <>
+            {page.date && <meta itemprop="datePublished" content={formatIso(page.date)} />}
+            {page.date && <meta itemprop="dateModified" content={formatIso(page.date)} />}
+            <meta itemprop="wordCount" content={String(page.wordCount)} />
+            <meta itemprop="keywords" content={keywords} />
+        </>
+    )
+}
+
+<!-- OpenGraph -->
+<meta property="og:title" content={page.title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content={isPage ? "article" : "website"} />
+<meta property="og:url" content={permalink} />
+{
+    isPage
+        ? page.date && (
+              <>
+                  <meta property="article:published_time" content={formatIso(page.date)} />
+                  <meta property="article:modified_time" content={formatIso(page.date)} />
+              </>
+          )
+        : page.date && <meta property="og:updated_time" content={formatIso(page.date)} />
+}
+
+<!-- Twitter Cards -->
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={page.title} />
+<meta name="twitter:description" content={description} />

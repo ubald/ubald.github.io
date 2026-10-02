@@ -1,0 +1,49 @@
+---
+import Metadata from "~/components/Metadata.astro";
+import Pagination from "~/components/Pagination.astro";
+import { humanize, inSeries, seriesPartNumber, type Page } from "~/lib/pages.ts";
+import type { Pager } from "~/lib/pagination.ts";
+
+/** A section, taxonomy or taxonomy term: the paginated list of its articles. */
+interface Props {
+    page: Page;
+    pager: Pager;
+}
+
+const { page, pager } = Astro.props;
+---
+
+<section class={`list ${page.kind} ${page.singular ?? ""}-${page.title}`}>
+    <header class="list-header">
+        {page.kind === "term" && <div class="term">{humanize(page.singular!)}:</div>}
+        <h2>{humanize(page.title)}</h2>
+    </header>
+
+    <ol class="posts">
+        {
+            pager.pages.map((post) => (
+                <li>
+                    <article class={`preview${post.params.categories ? ` category-${post.params.categories[0]}` : ""}`}>
+                        <header>
+                            {inSeries(post) && (
+                                <h4 class="subtitle" aria-label="Post series">
+                                    {post.parent!.title} Part {seriesPartNumber(post)}
+                                </h4>
+                            )}
+                            <h3 class="title" aria-label="Post title">
+                                <a href={post.url} title={post.title}>
+                                    {post.title}
+                                </a>
+                            </h3>
+                            <Metadata page={post} />
+                        </header>
+                        <section class="content excerpt" aria-label="Excerpt">
+                            <span class="prompt">&gt;</span>&nbsp;{post.summary}
+                        </section>
+                    </article>
+                </li>
+            ))
+        }
+    </ol>
+    <Pagination pager={pager} />
+</section>

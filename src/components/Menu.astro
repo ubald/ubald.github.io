@@ -1,0 +1,17 @@
+---
+import { mainMenu } from "~/lib/site.ts";
+---
+
+<nav class="menu" role="navigation">
+    <ul>
+        {
+            mainMenu.map((entry) => (
+                <li>
+                    <a href={entry.url} title={entry.name}>
+                        {entry.name}
+                    </a>
+                </li>
+            ))
+        }
+    </ul>
+</nav>

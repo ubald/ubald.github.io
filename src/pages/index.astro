@@ -1,0 +1,26 @@
+---
+import Base from "~/layouts/Base.astro";
+import { fit } from "~/lib/images.ts";
+import { getSite } from "~/lib/pages.ts";
+
+const { home } = await getSite();
+const poster = home.params.poster && (await fit(home.params.poster, 1600, { quality: 80, format: "jpg", grayscale: home.params.poster_monochrome }));
+---
+
+<Base page={home}>
+    <article class="home">
+        <header class="cover">
+            {poster && <img src={poster} class="poster" aria-hidden="true" />}
+            <div class="titling">
+                <h1 class="title" aria-label="Title">{home.params.title}</h1>
+                {
+                    home.summary && (
+                        <div class="excerpt" aria-label="Excerpt">
+                            <span class="prompt">&gt;</span>&nbsp;<span class="input">{home.summary}</span>
+                        </div>
+                    )
+                }
+            </div>
+        </header>
+    </article>
+</Base>
