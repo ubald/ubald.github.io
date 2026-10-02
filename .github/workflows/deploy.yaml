@@ -1,20 +1,17 @@
 name: Deploy to GitHub Pages
 
+# Pull requests only build (and type-check) the site; pushes to master also deploy it.
 on:
     push:
+        branches:
+            - master
+    pull_request:
         branches:
             - master
     workflow_dispatch:
 
 permissions:
     contents: read
-    pages: write
-    id-token: write
-
-# One deployment at a time; let an in-progress deployment finish.
-concurrency:
-    group: pages
-    cancel-in-progress: false
 
 jobs:
     build:
@@ -33,19 +30,32 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
-            - uses: actions/configure-pages@v6
+            - name: Check types
+              run: pnpm check
+
+            - if: github.event_name != 'pull_request'
+              uses: actions/configure-pages@v6
 
             - name: Build site
               run: pnpm build
 
-            - uses: actions/upload-pages-artifact@v5
+            - if: github.event_name != 'pull_request'
+              uses: actions/upload-pages-artifact@v5
               with:
                   path: dist/
 
     deploy:
         name: Deploy
+        if: github.event_name != 'pull_request'
         needs: build
         runs-on: ubuntu-latest
+        permissions:
+            pages: write
+            id-token: write
+        # One deployment at a time; let an in-progress deployment finish.
+        concurrency:
+            group: pages
+            cancel-in-progress: false
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
