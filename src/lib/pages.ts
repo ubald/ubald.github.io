@@ -39,6 +39,8 @@ export interface Page {
     summary: string;
     wordCount: number;
     readingTime: number;
+    /** For regular pages, the author page (`/authors/<author>`) for the `author` parameter. */
+    author?: Page;
 }
 
 export interface Resource {
@@ -190,7 +192,10 @@ async function buildSite(): Promise<Site> {
     await Promise.all(regularPages.map(summarize));
     regularPages.sort(byDefaultOrder);
 
-    for (const page of regularPages) page.parent!.pages.push(page);
+    for (const page of regularPages) {
+        page.parent!.pages.push(page);
+        page.author = regularPages.find((p) => p.bundle === `authors/${urlize(page.params.author ?? "")}`);
+    }
     for (const section of sections.values()) {
         section.listPages = regularPages.filter((p) => p.url.startsWith(section.url) || p.parent === section);
         section.date ??= latestDate(section.listPages);
@@ -245,11 +250,5 @@ export const inSeries = (page: Page) => page.parent?.type === "series";
 
 /** Position of the page in its series (Hugo's `values/series-part-number` partial). */
 export const seriesPartNumber = (page: Page) => (inSeries(page) ? [...page.parent!.pages].reverse().indexOf(page) + 1 : 0);
-
-/** The author page (`/authors/<author>`) for the page's `author` parameter. */
-export async function authorOf(page: Page): Promise<Page | undefined> {
-    const { regularPages } = await getSite();
-    return regularPages.find((p) => p.bundle === `authors/${urlize(page.params.author ?? "")}`);
-}
 
 export { humanize, urlize };

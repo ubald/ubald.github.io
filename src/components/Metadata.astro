@@ -1,14 +1,14 @@
 ---
 import { formatLongDate } from "~/lib/dates.ts";
 import { fit } from "~/lib/images.ts";
-import { authorOf, humanize, urlize, type Page } from "~/lib/pages.ts";
+import { humanize, urlize, type Page } from "~/lib/pages.ts";
 
 interface Props {
     page: Page;
 }
 
 const { page } = Astro.props;
-const author = await authorOf(page);
+const { author } = page;
 const avatar = author?.params.avatar && (await fit(author.params.avatar, 128, { quality: 80, format: "jpg" }));
 const categories: string[] = [...new Set<string>(page.params.categories ?? [])];
 const tags: string[] = [...new Set<string>(page.params.tags ?? [])];
