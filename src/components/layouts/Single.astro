@@ -1,0 +1,52 @@
+---
+import { render } from "astro:content";
+import Author from "~/components/Author.astro";
+import Metadata from "~/components/Metadata.astro";
+import Series from "~/components/Series.astro";
+import { fit } from "~/lib/images.ts";
+import { inSeries, seriesPartNumber, type Page } from "~/lib/pages.ts";
+
+/** A regular page: an article, or an author (the About page). */
+interface Props {
+    page: Page;
+}
+
+const { page } = Astro.props;
+const { Content } = await render(page.entry!);
+const poster = page.params.poster && (await fit(page.params.poster, 1600, { quality: 80, format: "jpg" }));
+const categories: string[] | undefined = page.params.categories;
+const isAuthor = page.type === "authors";
+---
+
+<article class={`${page.kind} type-${page.type}${categories ? ` category-${categories[0]}` : ""}`}>
+    <header class="cover">
+        {poster && <img src={poster} class="poster" aria-hidden="true" />}
+        <div class="titling">
+            {
+                inSeries(page) && (
+                    <h3 class="subtitle" aria-label="Post series">
+                        {page.parent!.title} Part {seriesPartNumber(page)}
+                    </h3>
+                )
+            }
+            <h1 class="title" aria-label="Post title">{page.title}</h1>
+            <div class="excerpt" aria-label="Excerpt">
+                <span class="prompt">&gt;</span>&nbsp;<span class="input">{page.summary}</span>
+            </div>
+        </div>
+        {!isAuthor && <Metadata page={page} />}
+    </header>
+    <section class="content page">
+        <Series page={page} />
+        <Content />
+        <Series page={page} />
+        {
+            !isAuthor && (
+                <>
+                    <hr />
+                    <Author page={page} />
+                </>
+            )
+        }
+    </section>
+</article>

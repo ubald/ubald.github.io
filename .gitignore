@@ -1,3 +1,6 @@
-bin/
-public/
-resources/
+# Dependencies
+node_modules/
+
+# Astro build output and generated types
+dist/
+.astro/

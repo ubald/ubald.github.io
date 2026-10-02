@@ -1,0 +1,65 @@
+---
+import type { Pager } from "~/lib/pagination.ts";
+
+interface Props {
+    pager: Pager;
+}
+
+const { pager } = Astro.props;
+const { pageNumber, totalPages } = pager;
+const hasPrev = pageNumber > 1;
+const hasNext = pageNumber < totalPages;
+
+// Hugo's pagination partial: the first three pages, the last one and the current one's neighbours,
+// with an ellipsis for each run of hidden pages.
+const items: ({ number: number } | { ellipsis: true })[] = [];
+let ellipsed = false;
+for (let number = 1; number <= totalPages; number++) {
+    const show = number <= 3 || number === totalPages || (number > pageNumber - 2 && number < pageNumber + 2);
+    if (show) {
+        items.push({ number });
+        ellipsed = false;
+    } else if (!ellipsed) {
+        items.push({ ellipsis: true });
+        ellipsed = true;
+    }
+}
+---
+
+{
+    totalPages > 1 && (
+        <ul class="pagination">
+            <li class="page-item">
+                <a href={pager.url(1)} class="page-link" aria-label="First">
+                    <span aria-hidden="true"><i class="fas fa-angle-double-left" /></span>
+                </a>
+            </li>
+            <li class:list={["page-item", { disabled: !hasPrev }]}>
+                <a href={hasPrev ? pager.url(pageNumber - 1) : undefined} class="page-link" aria-label="Previous">
+                    <span aria-hidden="true"><i class="fas fa-angle-left" /></span>
+                </a>
+            </li>
+            {items.map((item) =>
+                "number" in item ? (
+                    <li class:list={["page-item", { active: item.number === pageNumber }]}>
+                        <a class="page-link" href={pager.url(item.number)}>{item.number}</a>
+                    </li>
+                ) : (
+                    <li class="page-item disabled">
+                        <span aria-hidden="true">&nbsp;&hellip;&nbsp;</span>
+                    </li>
+                ),
+            )}
+            <li class:list={["page-item", { disabled: !hasNext }]}>
+                <a href={hasNext ? pager.url(pageNumber + 1) : undefined} class="page-link" aria-label="Next">
+                    <span aria-hidden="true"><i class="fas fa-angle-right" /></span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a href={pager.url(totalPages)} class="page-link" aria-label="Last">
+                    <span aria-hidden="true"><i class="fas fa-angle-double-right" /></span>
+                </a>
+            </li>
+        </ul>
+    )
+}

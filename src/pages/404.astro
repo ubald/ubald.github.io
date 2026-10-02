@@ -1,0 +1,34 @@
+---
+import Base from "~/layouts/Base.astro";
+import mini from "~/assets/images/cats/mini.jpg";
+import { fit } from "~/lib/images.ts";
+import type { Page } from "~/lib/pages.ts";
+
+const page: Page = {
+    kind: "404",
+    type: "404",
+    title: "404 Page not found",
+    url: "/404.html",
+    params: {},
+    pages: [],
+    listPages: [],
+    summary: "",
+    wordCount: 0,
+    readingTime: 0,
+};
+const poster = await fit(mini, 1600, { quality: 80, format: "jpg" });
+---
+
+<Base page={page}>
+    <article class="home">
+        <header class="cover">
+            <img src={poster} class="poster" />
+            <div class="titling">
+                <h1 class="title" aria-label="Title">404<br />Not Found</h1>
+                <div class="excerpt" aria-label="Excerpt">
+                    <span class="prompt">&gt;</span>&nbsp;<span class="input">The requested page could not be found.</span>
+                </div>
+            </div>
+        </header>
+    </article>
+</Base>
