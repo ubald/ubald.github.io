@@ -1,12 +1,12 @@
 ---
 import { fit } from "~/lib/images.ts";
-import { authorOf, type Page } from "~/lib/pages.ts";
+import type { Page } from "~/lib/pages.ts";
 
 interface Props {
     page: Page;
 }
 
-const author = await authorOf(Astro.props.page);
+const { author } = Astro.props.page;
 const avatar = author?.params.avatar && (await fit(author.params.avatar, 256, { quality: 90, format: "jpg" }));
 ---
 
