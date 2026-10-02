@@ -4,7 +4,7 @@ The source of [ubald.dev](https://ubald.dev), built with [Astro](https://astro.b
 
 ## Running
 
-Requires Node 24 and pnpm.
+Requires Node 24 and pnpm. With Nix, `direnv allow` (or `nix develop`) enters a shell that provides both.
 
 ```sh
 pnpm install
